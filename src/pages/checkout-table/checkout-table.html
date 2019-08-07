@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title class="ftc-dusty-font" style="font-size: 200%;">Number of Table</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <div padding class="panel">
+    <ion-item>
+      <ion-label color="primary" floating>Name</ion-label>
+      <ion-input type="text" maxlength="100" [(ngModel)]="name"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label color="primary" floating>Please inform the number of your table</ion-label>
+      <ion-input type="text" maxlength="2" [(ngModel)]="tableNumber"></ion-input>
+    </ion-item>
+    
+    <ion-item>
+      <ion-label color="primary" floating>Phone Number</ion-label>
+      <ion-input type="text" maxlength="15" [(ngModel)]="phone"></ion-input>
+    </ion-item>
+  
+    <div padding><button ion-button round class="center single-button" (click)="showYesNoDialog()">Confirm</button></div>
+  </div>
+</ion-content>
+  

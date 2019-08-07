@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle *ngIf="showMenu">
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title class="ftc-dusty-font" style="font-size: 200%; margin-left: 15px;">Choose a deli</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-card *ngFor="let shop of shops">
+    <ion-card-content>
+      <ng-template [ngIf]="shop.available || !disableClosedShops" [ngIfElse]="notOpened">
+          <ion-item>
+            <ion-label class="primary-color bold">{{ shop.name }}</ion-label>
+            <ion-radio value="{{ shop.id }}" (ionSelect)="confirmShop(shop)"></ion-radio>
+          </ion-item>
+          <p>{{ shop.address }}</p>
+        </ng-template>
+        <ng-template #notOpened>
+          <ion-item>
+            <ion-label class="primary-color bold">{{ shop.name }}</ion-label>
+          </ion-item>
+          <p>{{ shop.address }}</p>
+          <p class="shop_closed">This shop is closed at this moment.</p>
+      </ng-template>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

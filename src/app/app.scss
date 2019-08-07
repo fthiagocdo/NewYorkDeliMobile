@@ -1,16 +1,132 @@
-// http://ionicframework.com/docs/theming/
+  .toolbar-title {
+    padding-left: 0px;
+    font-size: 2.4rem;
+  }
 
+  .content{
+    background-image: url("/assets/imgs/background.png");
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .panel{
+      background: white;
+      -webkit-border-radius: 2%;
+      border-radius: 2%;
+  }
+  
+  .primary-color{
+      color: #4f4d1f !important;
+  }
+  
+  .error-color{
+      color: red !important;
+  }
+  
+  .circle-pic{
+      background: white;
+      -webkit-border-radius: 50%;
+      border-radius: 50%;
+  }
+  
+  .divider{
+      height: 1px;
+      overflow: hidden;
+      background-color: #4f4d1f;
+  }
+  
+  .center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+  }
+  
+  .header-degrade{
+      background: linear-gradient(90deg, #4f4d1f 0%, #a4b357 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+      color: white;
+      font-size: 20px;
+  }
+  
+  .no-border div{
+      border: 0px !important;
+  }
+  
+  .single-button{
+      width:200px;
+  }
+  
+  .bold{
+      font-weight: bold;
+      font-size: 1.6rem;
+  }
+  
+  .card .row{
+      background: #4f4d1f;
+  }
+  
+  .card .row .button{
+      color: white;
+      -webkit-border-radius: 50%;
+      border-radius: 50%;
+  }
+  
+  .checkout-total button{
+      vertical-align: baseline;
+  }
+  
+  .checkout-card{
+      border-radius: 10px;
+  }
 
-// App Global Sass
-// --------------------------------------------------
-// Put style rules here that you want to apply globally. These
-// styles are for the entire app and not just one component.
-// Additionally, this file can be also used as an entry point
-// to import other Sass files to be included in the output CSS.
-//
-// Shared Sass variables, which can be used to adjust Ionic's
-// default Sass variables, belong in "theme/variables.scss".
-//
-// To declare rules for a specific mode, create a child rule
-// for the .md, .ios, or .wp mode classes. The mode class is
-// automatically applied to the <body> element in the app.
+  .ftc-card-content {
+    padding-top: 0px;
+    padding-bottom: 0px;  
+  }
+
+  .ftc-button-menu {
+    margin-bottom: 10px;
+    color: #4f4d1f !important;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.2) !important;
+    box-shadow: unset;
+  }
+
+  .ftc-button-menu-item {
+    max-width: 75%;
+    padding: 5px 0px 0px 10px;
+  }
+
+  .ftc-button-menu-price {
+    max-width: 25%; 
+    margin-left: 5px;
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    padding: 0px;
+  }
+
+  .ftc-button-menu-price p {
+    padding-left: 0px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+  }
+
+  .ftc-button-menu-name {
+    margin-top: 0px; 
+    margin-bottom: 0px;
+    padding-left: 0px;
+  }
+
+  .ftc-button-menu-description {
+    margin-top: 0px; 
+    margin-bottom: 5px;
+    padding-left: 0px;
+    font-size: 1.5rem 
+  }
+
+  .ftc-dusty-font {
+    font-size: 2rem;
+    font-family: "kimberly-geswein_kg-broken-vessels-sketch" !important;
+    font-weight: normal;
+  }

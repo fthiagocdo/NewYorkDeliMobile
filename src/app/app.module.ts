@@ -1,34 +1,108 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpModule } from '../../node_modules/@angular/http';
 import { ErrorHandler, NgModule } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
+import { AngularFireModule } from 'angularfire2';
+import { AngularFireAuthModule } from 'angularfire2/auth';
+import { GooglePlus } from '@ionic-native/google-plus'
+import { Facebook } from '@ionic-native/facebook';
+import { IonicStorageModule } from '@ionic/storage';
+import { AES256 } from '@ionic-native/aes-256';
 
 import { MyApp } from './app.component';
-import { HomePage } from '../pages/home/home';
-import { ListPage } from '../pages/list/list';
+import { MenuPage } from '../pages/menu/menu';
+import { MenuItemPage } from '../pages/menu-item/menu-item';
+import { MenuExtraPage } from '../pages/menu-extra/menu-extra';
+import { LoginPage } from '../pages/login/login';
+import { ContactUsPage } from '../pages/contact-us/contact-us';
+import { ProfilePage } from '../pages/profile/profile';
+import { OrderHistoryPage } from '../pages/order-history/order-history';
+import { OrderDetailsPage } from '../pages/order-details/order-details';
+import { CheckoutPage } from '../pages/checkout/checkout';
+import { CheckoutAddressPage } from '../pages/checkout-address/checkout-address';
+import { ResetPasswordPage } from '../pages/reset-password/reset-password';
+import { ShopPage } from '../pages/shop/shop';
+import { CheckoutTablePage } from '../pages/checkout-table/checkout-table';
+import { SignUpPage } from '../pages/sign-up/sign-up';
+import { CheckoutCollectPage } from '../pages/checkout-collect/checkout-collect';
+import { PaymentPage } from '../pages/payment/payment';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import { Authentication } from '../providers/auth/auth';
+import { Utils } from '../utils/utils';
+import { HttpServiceProvider } from '../providers/http-service/http-service';
+import { SagepayProvider } from '../providers/sagepay/sagepay';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAuTKvGborYvmUbsJZCGblJPkQToftLwbc",
+  authDomain: "new-york-deli-70024.firebaseapp.com",
+  databaseURL: "https://new-york-deli-70024.firebaseio.com",
+  projectId: "new-york-deli-70024",
+  storageBucket: "new-york-deli-70024.appspot.com",
+  messagingSenderId: "97143556372",
+  appId: "1:97143556372:web:4dfaf119098fde1e"
+}
 
 @NgModule({
   declarations: [
     MyApp,
-    HomePage,
-    ListPage
+    MenuPage,
+    MenuItemPage,
+    MenuExtraPage,
+    LoginPage,
+    ContactUsPage,
+    ProfilePage,
+    OrderHistoryPage,
+    OrderDetailsPage,
+    CheckoutPage,
+    CheckoutAddressPage,
+    ResetPasswordPage,
+    SignUpPage,
+    ShopPage,
+    CheckoutTablePage,
+    CheckoutCollectPage,
+    PaymentPage
   ],
   imports: [
     BrowserModule,
     IonicModule.forRoot(MyApp),
+    HttpModule,
+    AngularFireModule.initializeApp(firebaseConfig),
+    AngularFireAuthModule,
+    IonicStorageModule.forRoot()
   ],
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    HomePage,
-    ListPage
+    MenuPage,
+    MenuItemPage,
+    MenuExtraPage,
+    LoginPage,
+    ContactUsPage,
+    ProfilePage,
+    OrderHistoryPage,
+    OrderDetailsPage,
+    CheckoutPage,
+    CheckoutAddressPage,
+    ResetPasswordPage,
+    SignUpPage,
+    ShopPage,
+    CheckoutTablePage,
+    CheckoutCollectPage,
+    PaymentPage
   ],
   providers: [
     StatusBar,
     SplashScreen,
-    {provide: ErrorHandler, useClass: IonicErrorHandler}
+    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    GooglePlus,
+    Facebook,
+    AES256,
+    Authentication,
+    Utils,
+    SagepayProvider,
+    HttpServiceProvider
   ]
 })
 export class AppModule {}

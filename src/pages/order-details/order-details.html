@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-navbar>
+    <ion-buttons end padding-right>
+      <button ion-button icon-only (click)="goToCheckoutPage()">
+        <ion-icon name="cart"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title class="ftc-dusty-font" style="font-size: 200%;">Order Details</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+    <ion-card *ngFor="let item of checkoutItems">
+      <ion-item class="checkout-item">
+        <h1 class="primary-color"><b>{{ item.name }}</b></h1>
+        <p class="primary-color"><b>Type: </b>{{ item.type }}</p>
+        <p class="primary-color" *ngIf="item.checkoutItemExtras.length > 0"><b>Extras: </b></p>
+        <p padding-left class="primary-color" *ngFor="let extra of item.checkoutItemExtras">{{ extra.name }}</p>
+        <p class="primary-color"><span float-left><b>Quantity: </b></span><span float-right>x{{ item.quantity }}</span></p>
+        <p class="primary-color"><span float-left><b>Price: </b></span><span float-right>{{ item.price | currency:"£" }}</span></p>
+        <p class="divider"></p>
+        <p class="primary-color"><span float-left><b>Total: </b></span><span float-right>{{ item.totalValue | currency:"£" }}</span></p>
+      </ion-item>
+    </ion-card>
+
+    <ion-card class="checkout-card">
+      <ion-item class="checkout-total">
+        <p class="primary-color"><span float-left><b>Subtotal: </b></span><span float-right>{{ partialValue | currency:"£" }}</span></p>
+        <p class="primary-color"><span float-left><b>Delivery Fee: </b></span><span float-right>{{ deliveryFee | currency:"£" }}</span></p>
+        <p class="primary-color"><span float-left><b>Rider Tip: </b></span><span float-right>{{ riderTip | currency:"£" }}</span></p>
+        <p class="divider"></p>
+        <p class="primary-color"><span float-left><b>Total: </b></span><span float-right>{{ totalValue | currency:"£" }}</span></p>
+      </ion-item>
+    </ion-card>
+
+    <ng-template [ngIf]="checkoutMessage != null">
+    <ion-card class="checkout-card">
+      <ion-item>
+        <ion-textarea maxlength="500" [(ngModel)]="checkoutMessage" rows="3" cols="12" disabled>{{ checkoutMessage }}</ion-textarea>
+      </ion-item>
+    </ion-card>
+    </ng-template>
+    <div padding><button ion-button full round (click)="orderAgain(checkoutId)">Order Again</button></div>
+</ion-content>

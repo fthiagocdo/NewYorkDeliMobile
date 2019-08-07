@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-buttons end padding-right *ngIf="currentUser.isLogged">
+      <button ion-button icon-only (click)="goToCheckoutPage()">
+        <ion-icon name="cart"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title class="ftc-dusty-font" style="font-size: 200%;">Order History</ion-title>
+  </ion-navbar>
+</ion-header>
+  
+<ion-content padding>
+  <ion-card *ngIf="orders?.length != 0 && isListRead">
+    <ion-card-content>
+      <p class="primary-color bold">These are all your orders from {{ currentShop.shopName }}:</p>
+    </ion-card-content>
+  </ion-card>
+  <ion-card *ngIf="orders?.length == 0  && isListRead">
+    <ion-card-content>
+      <p class="primary-color bold">Sorry, you do not have orders from {{ currentShop.shopName }}.</p>
+    </ion-card-content>
+  </ion-card>
+  <ion-card *ngFor="let order of orders">
+    <ion-item>
+      <p class="primary-color"><b>Order Number: </b>{{ (order.payment.order_number) }}</p>
+      <p class="primary-color"><b>Date: </b>{{ order.updated_at | date:"dd/MM/yyyy 'at' h:mma" }}</p>
+      <p class="primary-color"><b>Value: </b>{{ order.total_value | currency:"£" }}</p>
+      <p class="primary-color"><b>{{ order.deliver_or_collect == 'deliver_address' || order.deliver_or_collect == 'deliver_table' ? 'Order to deliver at ' : 'Order to collect at ' }}{{ order.deliver_or_collect == 'deliver_address' ? 'your address at ' : '' }}{{ order.deliver_or_collect == 'deliver_table' ? 'your table at ' : '' }}{{ order.time_delivery_collect }}</b></p>
+    </ion-item>
+    <ion-row>
+      <ion-col>
+        <button ion-button icon-only clear float-right (click)="goToOrderDetails(order.id)">
+          <ion-icon name="eye"></ion-icon>
+        </button>
+      </ion-col>
+    </ion-row>
+  </ion-card>
+</ion-content>
+  

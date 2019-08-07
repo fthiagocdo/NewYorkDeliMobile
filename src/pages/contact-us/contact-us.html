@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-buttons end padding-right *ngIf="currentUser.isLogged">
+      <button ion-button icon-only (click)="goToCheckoutPage()">
+        <ion-icon name="cart"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title class="ftc-dusty-font" style="font-size: 200%;">Contact us</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <div padding class="panel">
+    <div padding><img src="assets/imgs/contactus/0{{randomNumber}}.jpg"/></div>
+
+    <div class="divider"></div>
+    
+    <ion-item>
+      <ion-label color="primary" floating>Name</ion-label>
+      <ion-input type="text" maxlength="100" [(ngModel)]="name"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label color="primary" floating>E-mail</ion-label>
+      <ion-input type="email" maxlength="100" [(ngModel)]="email"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label color="primary" floating>Message</ion-label>
+      <ion-textarea maxlength="500" rows="5" [(ngModel)]="message"></ion-textarea>
+    </ion-item>
+
+    <div padding><button ion-button full round (click)="sendMessage()">Send</button></div>
+  </div>
+</ion-content>

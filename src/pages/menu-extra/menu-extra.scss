@@ -1,0 +1,34 @@
+page-menu-extra {
+
+    .ftc-ion-item {
+        padding-left: 0px;
+        height: 100%;
+        font-size: 2.2rem;
+        background-color: transparent;
+    }
+
+    .ftc-checkbox {
+        margin-right: 10px !important;
+    }
+
+    .item-md.item-block .item-inner {
+        border-bottom: 0px;
+    }
+
+    .label {
+        margin: 0px;
+    }
+
+    .ftc-order-now {
+        position: relative;
+    }
+
+    .ftc-order-now img {
+        bottom: -400px;
+        width: 100px;
+        left: 50%;
+        margin-left: -28px;
+        position: absolute;
+    }
+
+}

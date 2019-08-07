@@ -1,15 +1,41 @@
 <ion-menu [content]="content">
-  <ion-header>
-    <ion-toolbar>
-      <ion-title>Menu</ion-title>
-    </ion-toolbar>
+  <ion-header class="header-degrade">
+    <ion-grid>
+      <ng-template [ngIf]="currentUser.isLogged" [ngIfElse]="guest_header">
+        <ion-row padding-top padding-left>
+          <img src="{{ currentUser.photo }}" width="100px" height="100px" class="circle-pic"/>
+        </ion-row>
+        <ion-row padding>
+            <ng-template [ngIf]="!this.utils.isEmpty(currentUser.name)" [ngIfElse]="showEmail">
+              <b>{{ currentUser.name }}</b>
+            </ng-template>
+            <ng-template #showEmail>
+                <b>{{ currentUser.email }}</b>
+            </ng-template>
+        </ion-row>
+      </ng-template>
+      <ng-template #guest_header>
+        <ion-row padding>
+          <b>New York Deli</b>
+        </ion-row>
+      </ng-template>
+    </ion-grid>
   </ion-header>
 
-  <ion-content>
+  <ion-content style="background: white">
     <ion-list>
-      <button menuClose ion-item *ngFor="let p of pages" (click)="openPage(p)">
-        {{p.title}}
-      </button>
+      <ng-template [ngIf]="currentUser.isLogged" [ngIfElse]="guest_menu">
+        <button class="no-border" menuClose ion-item *ngFor="let p of pagesUser" (click)="openPage(p)">
+          <ion-icon [name]="p.icon" item-start></ion-icon>
+          {{p.title}}
+        </button>
+      </ng-template>
+      <ng-template #guest_menu>
+          <button class="no-border" menuClose ion-item *ngFor="let p of pagesGuest" (click)="openPage(p)">
+              <ion-icon [name]="p.icon" item-start></ion-icon>
+              {{p.title}}
+            </button>
+      </ng-template>
     </ion-list>
   </ion-content>
 

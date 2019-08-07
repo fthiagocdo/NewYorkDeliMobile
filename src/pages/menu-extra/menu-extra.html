@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-navbar>
+    <ion-buttons end padding-right>
+      <button ion-button icon-only (click)="goToCheckoutPage()">
+        <ion-icon name="cart"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title class="ftc-dusty-font">Need an extra?</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <div class="content" style="padding: 5px;">
+    <ion-grid>
+      <ion-row *ngFor="let menuExtra of menuExtras">
+        <ion-col class="ftc-dusty-font ftc-button-menu" style="display: flex; align-items: center; max-width: 7%">
+          <ion-checkbox (ionChange)="addMenuExtra($event, menuExtra.id)" style="padding-left: 5px;"></ion-checkbox>
+        </ion-col>
+        <ion-col class="ftc-dusty-font ftc-button-menu">
+          <p style="padding-left: 5px; margin: 0px;">{{ menuExtra.name }}</p>
+        </ion-col>
+        <ion-col class="ftc-dusty-font ftc-button-menu" style="margin-left: 5px; max-width: 23%; display: flex; align-items: center;">
+            <p style="padding-left: 5px; margin: 0px;">{{ menuExtra.price | currency:"£" }}</p>
+        </ion-col>
+      </ion-row>
+      <ion-row style="height: 120px;"></ion-row>
+    </ion-grid>
+  </div>
+  <ion-fab bottom center style="margin-left: -50px;">
+    <img src="/assets/imgs/order-now.png" (click)="confirm()" style="width: 100px;"/>
+  </ion-fab>
+</ion-content>

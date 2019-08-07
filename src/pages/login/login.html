@@ -1,0 +1,52 @@
+<ion-header>
+    <ion-navbar>
+      <button ion-button menuToggle>
+        <ion-icon name="menu"></ion-icon>
+      </button>
+      <ion-title class="ftc-dusty-font" style="font-size: 200%;">Login</ion-title>
+    </ion-navbar>
+  </ion-header>
+
+<ion-content padding>
+  <div padding class="panel">
+    <ion-grid padding>
+      <ion-row>
+          <ion-col col-6>
+            <button ion-button icon-start full color="facebook" (click)="loginFacebook()">
+              <ion-icon name="logo-facebook"></ion-icon>
+              Facebook
+            </button>
+          </ion-col>
+          <ion-col col-6>
+            <button ion-button icon-start full color="google" (click)="loginGoogle()">
+              <ion-icon name="logo-googleplus"></ion-icon>
+              Google
+            </button>
+          </ion-col>
+        </ion-row>
+    </ion-grid>
+
+    <ion-item>
+      <ion-label color="primary" floating>E-mail</ion-label>
+      <ion-input type="email" maxlength="100" [(ngModel)]="email"></ion-input>
+    </ion-item>
+  
+    <ion-item>
+      <ion-label color="primary" floating>Password</ion-label>
+      <ion-input type="password" maxlength="20" [(ngModel)]="password"></ion-input>
+    </ion-item>
+
+    <button ion-button small clear float-right (click)="resetPassword()">Reset Password</button>
+
+    <ion-grid padding>
+      <ion-row>
+        <ion-col col-6>
+          <button ion-button full round (click)="signUp()">Sign up</button>
+        </ion-col>
+        <ion-col col-6>
+          <button ion-button full round (click)="loginMail()">Log in</button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

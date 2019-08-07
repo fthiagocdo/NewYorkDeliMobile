@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-buttons end padding-right *ngIf="currentUser.isLogged">
+      <button ion-button icon-only (click)="goToCheckoutPage()">
+        <ion-icon name="cart"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title class="ftc-dusty-font" style="font-size: 200%;">Profile</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+    <div padding class="panel">
+      <ion-item>
+        <ion-label color="primary" floating>Name</ion-label>
+        <ion-input type="text" maxlength="100" [(ngModel)]="name"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label color="primary" floating>E-mail</ion-label>
+        <ion-input type="email" [(ngModel)]="email" readonly="true"></ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="provider == 'email'">
+        <ion-label color="primary" floating>Password</ion-label>
+        <ion-input type="password" maxlength="20" [(ngModel)]="password"></ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="provider == 'email'">
+        <ion-label color="primary" floating>Confirm Password</ion-label>
+        <ion-input type="password" maxlength="20" [(ngModel)]="confirmPassword"></ion-input>
+      </ion-item>
+    
+      <ion-item>
+        <ion-label color="primary" floating>Phone Number</ion-label>
+        <ion-input type="text" maxlength="20" [(ngModel)]="phone"></ion-input>
+      </ion-item>
+  
+      <ion-item>
+        <ion-label color="primary" floating>Post Code</ion-label>
+        <ion-input type="text" maxLength="20" [(ngModel)]="postcode"></ion-input>
+      </ion-item>
+  
+      <ion-item>
+        <ion-label color="primary" floating>Address</ion-label>
+        <ion-input type="text" maxlength="100" [(ngModel)]="address"></ion-input>
+      </ion-item>
+  
+      <ion-list>
+        <ion-item>
+          <ion-label>Receive Notifications?</ion-label>
+          <ion-checkbox [(ngModel)]="receiveNotifications"></ion-checkbox>
+        </ion-item>
+      </ion-list>
+    
+      <div padding><button ion-button round class="center single-button" (click)="confirm()">Confirm</button></div>
+  </div>
+</ion-content>
