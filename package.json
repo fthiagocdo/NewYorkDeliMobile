@@ -29,7 +29,7 @@
     "@ionic/storage": "^2.2.0",
     "angularfire2": "^5.0.0-rc.12",
     "cordova-android": "7.1.4",
-    "cordova-ios": "4.5.5",
+    "cordova-ios": "^4.5.5",
     "cordova-plugin-add-swift-support": "1.7.1",
     "cordova-plugin-aes256-encryption": "1.2.2",
     "cordova-plugin-device": "^2.0.2",
@@ -45,7 +45,8 @@
     "ionicons": "3.0.0",
     "rxjs": "5.5.11",
     "sw-toolbox": "3.6.0",
-    "zone.js": "0.8.29"
+    "zone.js": "0.8.29",
+    "cordova-plugin-secure-storage": "3.0.2"
   },
   "devDependencies": {
     "@ionic/app-scripts": "3.2.2",
