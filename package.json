@@ -29,7 +29,7 @@
     "@ionic/storage": "^2.2.0",
     "angularfire2": "^5.0.0-rc.12",
     "cordova-android": "7.1.4",
-    "cordova-ios": "^4.5.5",
+    "cordova-ios": "5.0.1",
     "cordova-plugin-add-swift-support": "^2.0.2",
     "cordova-plugin-aes256-encryption": "1.2.2",
     "cordova-plugin-device": "^2.0.2",
