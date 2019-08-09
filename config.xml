@@ -102,5 +102,4 @@
         <splash height="2732" src="resources/ios/splash/Default@2x~universal~anyany.png" width="2732" />
     </platform>
     <engine name="ios" spec="~4.5.5" />
-    <plugin name="cordova-plugin-add-swift-support" spec="^2.0.2" />
 </widget>

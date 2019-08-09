@@ -29,8 +29,8 @@
     "@ionic/storage": "^2.2.0",
     "angularfire2": "^5.0.0-rc.12",
     "cordova-android": "7.1.4",
-    "cordova-ios": "5.0.1",
-    "cordova-plugin-add-swift-support": "^2.0.2",
+    "cordova-ios": "^4.5.5",
+    "cordova-plugin-add-swift-support": "1.7.1",
     "cordova-plugin-aes256-encryption": "1.2.2",
     "cordova-plugin-device": "^2.0.2",
     "cordova-plugin-facebook4": "^4.2.1",
@@ -74,8 +74,7 @@
       "cordova-plugin-googleplus": {
         "REVERSED_CLIENT_ID": "com.googleusercontent.apps.97143556372-i118d3shl7m97373hjkfptt7i27f6u2s",
         "PLAY_SERVICES_VERSION": "11.8.0"
-      },
-      "cordova-plugin-add-swift-support": {}
+      }
     },
     "platforms": [
       "android",
