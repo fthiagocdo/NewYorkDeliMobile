@@ -55,8 +55,8 @@ export class MenuItemPage {
       });
   }
 
-  downloadImageMenuItem(id) {
-    return this.http.downloadImageMenuItem(id);
+  downloadImageMenuItem() {
+    return this.http.downloadImageMenuItem(this.menuTypeName);
   }
 
   goToMenuExtra(id) {

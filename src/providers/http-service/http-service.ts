@@ -83,8 +83,8 @@ export class HttpServiceProvider {
       });
   }
 
-  downloadImageMenuItem(id) {
-    return this.url+'menuitem/image/'+id;
+  downloadImageMenuItem(menuType) {
+    return this.url+'menuitem/image/'+menuType;
   }
 
   getMenuExtras(menuitemId) {
