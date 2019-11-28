@@ -10,7 +10,7 @@ export class HttpServiceProvider {
   
   constructor(public http: Http, public platform: Platform, public utils: Utils) { 
       //if(this.platform.is('cordova')){
-        this.url = 'http://nyd-delivery.hostingerapp.com/api/';
+        this.url = 'http://newyorkdelidelivery.ftcdevsolutions.com/api/';
       /*}else{
         this.url = 'http://localhost:8000/api/';
       }*/
