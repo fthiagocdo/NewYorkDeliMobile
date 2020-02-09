@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { Utils } from '../../utils/utils';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { HttpServiceProvider } from '../../providers/http-service/http-service';
 import { LoginPage } from '../login/login';
+import { PreloaderProvider } from '../../providers/preloader/preloader';
 
 @IonicPage()
 @Component({
@@ -13,23 +14,22 @@ import { LoginPage } from '../login/login';
 export class ResetPasswordPage {
   email: string = '';
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public utils: Utils, 
-    public loadingCtrl: LoadingController, public angularFireAuth: AngularFireAuth, public http: HttpServiceProvider) {
+  constructor(
+    public navCtrl: NavController, 
+    public navParams: NavParams, 
+    public utils: Utils, 
+    public angularFireAuth: AngularFireAuth, 
+    public http: HttpServiceProvider,
+    public loader: PreloaderProvider) {
   }
 
   ionViewDidLoad() {
-    let loading = this.navParams.get('loading');
-    if(loading != null){
-      loading.dismiss();
-    }
+    this.loader.hidePreloader();
   }
 
   confirm() {
     if(this.validateData()){
-      let loading = this.loadingCtrl.create({
-        content: 'Please wait...'
-      });
-      loading.present();
+      this.loader.displayPreloader();
 
       let utils = this.utils;
       let navCtrl = this.navCtrl;
@@ -38,12 +38,9 @@ export class ResetPasswordPage {
       this.angularFireAuth.auth.sendPasswordResetEmail(this.email)
         .then(data => {
           utils.showMessage('Please verify your mailbox to find an e-mail to help you to resetting your password.', 'info');
-          navCtrl.setRoot(LoginPage, 
-            {
-              'loading': loading,
-            });
+          navCtrl.setRoot(LoginPage);
         }, err => {
-            loading.dismiss();
+            this.loader.hidePreloader();
             utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
         }); 
     }

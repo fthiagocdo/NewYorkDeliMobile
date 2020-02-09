@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import { HttpServiceProvider } from '../../providers/http-service/http-service';
 import { Authentication } from '../../providers/auth/auth';
 import { Utils } from '../../utils/utils';
-import { PaymentPage } from '../payment/payment';
+import { PaymentIframePage } from '../payment-iframe/payment-iframe';
+import { PreloaderProvider } from '../../providers/preloader/preloader';
 
 @IonicPage()
 @Component({
@@ -18,9 +19,14 @@ export class CheckoutTablePage {
   phone: string;
   amount: string;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public http: HttpServiceProvider,
-    public auth: Authentication, public loadingCtrl: LoadingController, public alertCtrl: AlertController,
-    public utils: Utils) {
+  constructor(
+    public navCtrl: NavController, 
+    public navParams: NavParams, 
+    public http: HttpServiceProvider,
+    public auth: Authentication, 
+    public alertCtrl: AlertController,
+    public utils: Utils,
+    public loader: PreloaderProvider) {
       this.auth.activeUser.subscribe(_user => {
         this.currentUser = _user;
         if(_user.phone != 'null'){
@@ -37,11 +43,7 @@ export class CheckoutTablePage {
   }
 
   ionViewDidLoad() {
-    let loading = this.navParams.get('loading');
-    if(loading != null){
-      loading.dismiss();
-    }
-
+    this.loader.hidePreloader();
     this.amount = this.navParams.get("amount");
   }
 
@@ -49,11 +51,8 @@ export class CheckoutTablePage {
     if(this.isCustomerDetailsDifferent()){
       this.showYesNoDialog();
     }else{
-      let loading = this.loadingCtrl.create({
-        content: 'Please wait...'
-      });
-      loading.present();
-      this.confirmTable(loading);
+      this.loader.displayPreloader();
+      this.confirmTable();
     }
   }
 
@@ -75,21 +74,15 @@ export class CheckoutTablePage {
         text: 'No, thank you',
         cssClass: 'primary-color',
         handler: () => {
-          let loading = this.loadingCtrl.create({
-            content: 'Please wait...'
-          });
-          loading.present();
-          this.confirmTable(loading);
+          this.loader.displayPreloader();
+          this.confirmTable();
         }
       }, {
         text: 'Yes, please',
         cssClass: 'primary-color',
         handler: () => {
-          let loading = this.loadingCtrl.create({
-            content: 'Please wait...'
-          });
-          loading.present();
-          this.saveDetails(loading);
+          this.loader.displayPreloader();
+          this.saveDetails();
         }
       }],
       cssClass: 'primary-color'
@@ -97,7 +90,7 @@ export class CheckoutTablePage {
     alert.present();
   }
 
-  saveDetails(loading){
+  saveDetails(){
     this.currentUser.name = this.name;
     this.currentUser.phone = this.phone;
     //Updates user in the api
@@ -105,35 +98,34 @@ export class CheckoutTablePage {
       .subscribe(data => {
         //Error update user in the app
         if(data.error){
-          loading.dismiss();
+          this.loader.hidePreloader();
           this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
         }else{
-          this.confirmTable(loading);
+          this.confirmTable();
         }
       }
       , err => {
         //Error update password in firebase
-        loading.dismiss();
+        this.loader.hidePreloader();
         this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
       });
   }
 
-  confirmTable(loading) {
+  confirmTable() {
     this.http.confirmCheckout(this.currentUser.id, this.currentShop.shopId, "deliver_table", null, this.name, 
       this.phone, "", "", this.tableNumber)
       .subscribe(data => {
         if(data.error){
-          loading.dismiss();
+          this.loader.hidePreloader();
           this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
         }else{
-          this.navCtrl.push(PaymentPage, {
+          this.navCtrl.push(PaymentIframePage, {
             'userId': this.currentUser.id,
             'amount': this.amount,
-            'loading': loading
           });
         }
       }, err => {
-        loading.dismiss();
+        this.loader.hidePreloader();
         this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
       });
   }

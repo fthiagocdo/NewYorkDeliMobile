@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import { MenuPage } from '../menu/menu';
 import { MenuExtraPage } from '../menu-extra/menu-extra';
 import { CheckoutPage } from '../checkout/checkout';
@@ -8,6 +8,7 @@ import { Authentication } from '../../providers/auth/auth';
 import { Utils } from '../../utils/utils';
 import { LoginPage } from '../login/login';
 import { ShopPage } from '../shop/shop';
+import { PreloaderProvider } from '../../providers/preloader/preloader';
 
 @IonicPage()
 @Component({
@@ -20,9 +21,14 @@ export class MenuItemPage {
   menuItems: Array<{}>;
   menuTypeName: string = "";
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public http: HttpServiceProvider, 
-    public loadingCtrl: LoadingController, public auth: Authentication, public utils: Utils, 
-    public alertCtrl: AlertController) { 
+  constructor(
+    public navCtrl: NavController, 
+    public navParams: NavParams, 
+    public http: HttpServiceProvider, 
+    public auth: Authentication, 
+    public utils: Utils, 
+    public alertCtrl: AlertController,
+    public loader: PreloaderProvider) { 
       this.auth.activeUser.subscribe((_user)=>{
         this.currentUser = _user;
       });
@@ -33,24 +39,18 @@ export class MenuItemPage {
   }
 
   ionViewDidLoad() {
-    let loading = this.navParams.get('loading');
-    if(loading == null){
-      let loading = this.loadingCtrl.create({
-        content: 'Please wait...'
-      });
-      loading.present();
-    }
+    this.loader.displayPreloader();
 
     this.menuTypeName = this.navParams.get('menuTypeName').toLowerCase();
     let menutype_id = this.navParams.get('menuTypeId');
     this.http.getMenuItems(menutype_id)
       .subscribe(data => { 
         if(data.error){
-          loading.dismiss();
+          this.loader.hidePreloader();
           this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
         }else{
           this.menuItems = data.list;
-          loading.dismiss();
+          this.loader.hidePreloader();
         }
       });
   }
@@ -60,14 +60,10 @@ export class MenuItemPage {
   }
 
   goToMenuExtra(id) {
-    let loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    loading.present();
+    this.loader.displayPreloader();
 
     this.navCtrl.push(MenuExtraPage, {
       'menuItemId': id,
-      'loading': loading
     });
   }
 
@@ -75,15 +71,12 @@ export class MenuItemPage {
     if(!this.currentUser.isLogged){
       this.showYesNoDialog();
     }else{
-      let loading = this.loadingCtrl.create({
-        content: 'Please wait...'
-      });
-      loading.present();
+      this.loader.displayPreloader();
       
       this.http.getMenuExtras(menuItemId)
         .subscribe(data => { 
           if(data.error){
-            loading.dismiss();
+            this.loader.hidePreloader();
             this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
           }else{
             let menuExtras = data.list;
@@ -92,13 +85,12 @@ export class MenuItemPage {
               this.http.addMenuItem(this.currentUser.id, this.currentShop.shopId, menuItemId, menuExtras)
               .subscribe(data => { 
                 if(data.error){
-                  loading.dismiss();
+                  this.loader.hidePreloader();
                   this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
                 }else{
                   this.navCtrl.setRoot(MenuPage, {
                     'itemAdded': true,
                     'message': data.message,
-                    'loading': loading
                   });
                 }
               });
@@ -107,7 +99,6 @@ export class MenuItemPage {
               this.navCtrl.push(MenuExtraPage, {
                 'menuItemId': menuItemId,
                 'menuExtras': menuExtras,
-                'loading': loading
               });
             }
           }
@@ -134,22 +125,16 @@ export class MenuItemPage {
   }
 
   goToCheckoutPage() {
-    let loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    loading.present();
+    this.loader.displayPreloader();
 
     if(this.utils.isEmpty(this.currentShop.shopId)){
       this.navCtrl.setRoot(ShopPage, {
-        'loading': loading,
         'message': 'Before to proceed, please choose a shop.',
         'messageType': 'info',
-        'nextPage': 'Checkout'
+        'nextPage': 'Checkout',
       });
     }else{
-      this.navCtrl.setRoot(CheckoutPage, {
-        'loading': loading,
-      });
+      this.navCtrl.setRoot(CheckoutPage);
     }
   }
 }

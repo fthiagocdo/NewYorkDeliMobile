@@ -26,6 +26,7 @@ import { CheckoutTablePage } from '../pages/checkout-table/checkout-table';
 import { SignUpPage } from '../pages/sign-up/sign-up';
 import { CheckoutCollectPage } from '../pages/checkout-collect/checkout-collect';
 import { PaymentPage } from '../pages/payment/payment';
+import { PaymentIframePage } from '../pages/payment-iframe/payment-iframe';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -33,6 +34,7 @@ import { Authentication } from '../providers/auth/auth';
 import { Utils } from '../utils/utils';
 import { HttpServiceProvider } from '../providers/http-service/http-service';
 import { SagepayProvider } from '../providers/sagepay/sagepay';
+import { PreloaderProvider } from '../providers/preloader/preloader';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAuTKvGborYvmUbsJZCGblJPkQToftLwbc",
@@ -62,7 +64,8 @@ const firebaseConfig = {
     ShopPage,
     CheckoutTablePage,
     CheckoutCollectPage,
-    PaymentPage
+    PaymentPage,
+    PaymentIframePage,
   ],
   imports: [
     BrowserModule,
@@ -90,7 +93,8 @@ const firebaseConfig = {
     ShopPage,
     CheckoutTablePage,
     CheckoutCollectPage,
-    PaymentPage
+    PaymentPage,
+    PaymentIframePage,
   ],
   providers: [
     StatusBar,
@@ -102,7 +106,8 @@ const firebaseConfig = {
     Authentication,
     Utils,
     SagepayProvider,
-    HttpServiceProvider
+    HttpServiceProvider,
+    PreloaderProvider
   ]
 })
 export class AppModule {}

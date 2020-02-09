@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import { HttpServiceProvider } from '../../providers/http-service/http-service';
 import { CheckoutAddressPage } from '../checkout-address/checkout-address';
 import { CheckoutTablePage } from '../checkout-table/checkout-table';
 import { Utils } from '../../utils/utils';
 import { Authentication } from '../../providers/auth/auth';
 import { CheckoutCollectPage } from '../checkout-collect/checkout-collect';
+import { PreloaderProvider } from '../../providers/preloader/preloader';
 
 @IonicPage()
 @Component({
@@ -24,36 +25,34 @@ export class CheckoutPage {
   delivery: boolean;
   checkoutMessage: string;
   
-  constructor(public navCtrl: NavController, public navParams: NavParams, public http: HttpServiceProvider,
-  public auth: Authentication, public loadingCtrl: LoadingController, public alertCtrl: AlertController,
-  public utils: Utils) { 
-    this.auth.activeUser.subscribe(_user => {
-      this.currentUser = _user;
-    });
+  constructor(public navCtrl: NavController, 
+    public navParams: NavParams, 
+    public http: HttpServiceProvider,
+    public auth: Authentication,  
+    public alertCtrl: AlertController,
+    public utils: Utils,
+    public loader: PreloaderProvider) { 
+      this.auth.activeUser.subscribe(_user => {
+        this.currentUser = _user;
+      });
 
-    this.auth.activeShop.subscribe(_shop => {
-      this.currentShop = _shop;
-      this.delivery = _shop.delivery;
-    });
+      this.auth.activeShop.subscribe(_shop => {
+        this.currentShop = _shop;
+        this.delivery = _shop.delivery;
+      });
   }
 
   ionViewDidLoad() {
-    let loading = this.navParams.get('loading');
-    if(loading == null){
-      let loading = this.loadingCtrl.create({
-        content: 'Please wait...'
-      });
-      loading.present();
-    }
+    this.loader.displayPreloader();
 
-    this.loadData(loading);
+    this.loadData();
 
     let message = this.navParams.get('message');
     let messageType = this.navParams.get('messageType');
     this.utils.showMessage(message, messageType);
   }
 
-  loadData(loading) {
+  loadData() {
     this.http.getShoppingCart(this.currentUser.id, this.currentShop.shopId)
       .subscribe(data => { 
         this.partialValue = data.checkout.partial_value;
@@ -63,39 +62,36 @@ export class CheckoutPage {
         this.totalValue = data.checkout.total_value;
         this.checkoutItems = data.checkout.checkout_items;
         this.checkoutMessage = data.checkout.checkout_message;
-        loading.dismiss();
+        this.loader.hidePreloader();
       }, err => {
-        loading.dismiss();
+        this.loader.hidePreloader();
         this.utils.showMessage('It was not possible complete the request. Please try again later...', 'error');
       });
   }
 
-  saveSomethingElseMessage(loading, confirmCheckout){
+  saveSomethingElseMessage(confirmCheckout){
     if(this.checkoutMessage != null){
       this.http.setCheckoutMessage(this.currentUser.id, this.currentShop.shopId, this.checkoutMessage)
         .subscribe(data => { 
-          this.setNextPage(loading, confirmCheckout);
+          this.setNextPage(confirmCheckout);
         }, err => {
-          loading.dismiss();
+          this.loader.hidePreloader();
           this.utils.showMessage('It was not possible complete the request. Please try again later...', 'error');
         }
       );
     }else{
-      this.setNextPage(loading, confirmCheckout);
+      this.setNextPage(confirmCheckout);
     }   
   }
 
   removeMenuItem(checkoutItemId) {
-    let loading = this.loadingCtrl.create({
-      content: "Please wait..."
-    });
-    loading.present();
+    this.loader.displayPreloader();
 
     this.http.removeMenuItem(this.currentUser.id, this.currentShop.shopId, checkoutItemId)
       .subscribe(data => { 
-        this.saveSomethingElseMessage(loading, false); 
+        this.saveSomethingElseMessage(false); 
       }, err => {
-        loading.dismiss();
+        this.loader.hidePreloader();
         this.utils.showMessage('It was not possible complete the request. Please try again later...', 'error');
       }
     );
@@ -120,16 +116,13 @@ export class CheckoutPage {
 }
 
   plusMenuItem(checkoutItemId) {
-    let loading = this.loadingCtrl.create({
-      content: "Please wait..."
-    });
-    loading.present();
+    this.loader.displayPreloader
 
     this.http.plusMenuItem(this.currentUser.id, this.currentShop.shopId, checkoutItemId)
       .subscribe(data => { 
-        this.saveSomethingElseMessage(loading, false); 
+        this.saveSomethingElseMessage(false); 
       }, err => {
-        loading.dismiss();
+        this.loader.hidePreloader();
         this.utils.showMessage('It was not possible complete the request. Please try again later...', 'error');
       }
     );
@@ -141,16 +134,13 @@ export class CheckoutPage {
       this.showYesNoDialog(checkoutItemId);
     //Otherwise, minus one from the quantity
     }else{
-      let loading = this.loadingCtrl.create({
-        content: "Please wait..."
-      });
-      loading.present();
+      this.loader.displayPreloader();
   
       this.http.minusMenuItem(this.currentUser.id, this.currentShop.shopId, checkoutItemId)
         .subscribe(data => { 
-          this.saveSomethingElseMessage(loading, false);  
+          this.saveSomethingElseMessage(false);  
         }, err => {
-          loading.dismiss();
+          this.loader.hidePreloader();
           this.utils.showMessage('It was not possible complete the request. Please try again later...', 'error');
         }
       );
@@ -158,82 +148,67 @@ export class CheckoutPage {
   }
 
   plusRiderTip() {
-    let loading = this.loadingCtrl.create({
-      content: "Please wait..."
-    });
-    loading.present();
+    this.loader.displayPreloader();
     
     this.http.plusRiderTip(this.currentUser.id, this.currentShop.shopId)
       .subscribe(data => { 
-        this.saveSomethingElseMessage(loading, false);  
+        this.saveSomethingElseMessage(false);  
       }, err => {
-        loading.dismiss();
+        this.loader.hidePreloader();
         this.utils.showMessage('It was not possible complete the request. Please try again later...', 'error');
       }
     );
   }
 
   minusRiderTip() {
-    let loading = this.loadingCtrl.create({
-      content: "Please wait..."
-    });
-    loading.present();
+    this.loader.displayPreloader();
 
     this.http.minusRiderTip(this.currentUser.id, this.currentShop.shopId)
       .subscribe(data => { 
-        this.saveSomethingElseMessage(loading, false); 
+        this.saveSomethingElseMessage(false); 
       }, err => {
-        loading.dismiss();
+        this.loader.hidePreloader();
         this.utils.showMessage('It was not possible complete the request. Please try again later...', 'error');
       }
     );
   }
 
   setDeliverOrCollect(deliverOrCollect) {
-    let loading = this.loadingCtrl.create({
-      content: "Please wait..."
-    });
-    loading.present();
+    this.loader.displayPreloader();
 
     this.http.setDeliverOrCollect(this.currentUser.id, this.currentShop.shopId, deliverOrCollect)
       .subscribe(data => { 
-        this.saveSomethingElseMessage(loading, false);  
+        this.saveSomethingElseMessage(false);  
       }, err => {
-        loading.dismiss();
+        this.loader.hidePreloader();
         this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
       }
     );
   }
 
   confirmCheckout() {
-    let loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    loading.present();
+    this.loader.displayPreloader();
 
-    this.saveSomethingElseMessage(loading, true);   
+    this.saveSomethingElseMessage(true);   
   }
 
-  setNextPage(loading, confirmCheckout){
+  setNextPage(confirmCheckout){
     if(confirmCheckout){
       if(this.deliverOrCollect == 'deliver_address'){
         this.navCtrl.push(CheckoutAddressPage, {
           'amount': this.totalValue,
-          'loading': loading
         });
       }else if(this.deliverOrCollect == 'deliver_table'){
           this.navCtrl.push(CheckoutTablePage, {
             'amount': this.totalValue,
-            'loading': loading
           });
       }else{
         this.navCtrl.push(CheckoutCollectPage, {
           'amount': this.totalValue,
-          'loading': loading
         });
       }
     }else{
-      this.navCtrl.setRoot(CheckoutPage, {'loading': loading}); 
+      this.navCtrl.setRoot(CheckoutPage); 
     }
   }
 }

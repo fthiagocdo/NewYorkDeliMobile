@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { HttpServiceProvider } from '../../providers/http-service/http-service';
 import { CheckoutPage } from '../checkout/checkout';
 import { Utils } from '../../utils/utils';
 import { Authentication } from '../../providers/auth/auth';
+import { PreloaderProvider } from '../../providers/preloader/preloader';
 
 @IonicPage()
 @Component({
@@ -22,8 +23,13 @@ export class OrderDetailsPage {
   checkoutMessage: string;
   checkoutItems: Array<{}>;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public http: HttpServiceProvider,
-  public loadingCtrl: LoadingController, public utils: Utils, public auth: Authentication) { 
+  constructor(
+    public navCtrl: NavController, 
+    public navParams: NavParams, 
+    public http: HttpServiceProvider,
+    public utils: Utils, 
+    public auth: Authentication,
+    public loader: PreloaderProvider) { 
     this.auth.activeUser.subscribe(_user => {
       this.currentUser = _user;
     });
@@ -34,20 +40,14 @@ export class OrderDetailsPage {
   }
 
   ionViewDidLoad() {
-    let loading = this.navParams.get('loading');
-    if(loading == null){
-      loading = this.loadingCtrl.create({
-        content: 'Please wait...'
-      });
-      loading.present();
-    }
+    this.loader.displayPreloader();
 
     let orderId = this.navParams.get('orderId');
     this.http.findOrder(orderId)
       .subscribe(data => { 
         if(data.error){
           this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
-          loading.dismiss();
+          this.loader.hidePreloader();
         }else{
           this.checkoutId = data.order.payment.checkout_id;
           this.partialValue = data.order.partial_value; 
@@ -57,16 +57,13 @@ export class OrderDetailsPage {
           this.totalValue = data.order.total_value;
           this.checkoutMessage = data.order.checkout_message;
           this.checkoutItems = data.order.menu_items;
-          loading.dismiss();
+          this.loader.hidePreloader();
         }
       });
   }
 
   orderAgain(id) {
-    let loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    loading.present();
+    this.loader.displayPreloader();
 
     this.http.orderAgain(id, this.currentUser.id, this.currentShop.shopId)
       .subscribe(data => {
@@ -74,20 +71,13 @@ export class OrderDetailsPage {
           this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
         }else{
           this.navCtrl.setRoot(CheckoutPage, {
-            'loading': loading
           }); 
         }
       });
   }
 
   goToCheckoutPage() {
-    let loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    loading.present();
-
-    this.navCtrl.setRoot(CheckoutPage, {
-      'loading': loading,
-    });
+    this.loader.displayPreloader();
+    this.navCtrl.setRoot(CheckoutPage);
   }
 }

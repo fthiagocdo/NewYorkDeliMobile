@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, Platform, LoadingController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Platform, AlertController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { AES256 } from '@ionic-native/aes-256';
 import { GooglePlus } from '@ionic-native/google-plus';
@@ -13,6 +13,7 @@ import { HttpServiceProvider } from '../../providers/http-service/http-service';
 import { ShopPage } from '../shop/shop';
 import { ResetPasswordPage } from '../reset-password/reset-password';
 import { SignUpPage } from '../sign-up/sign-up';
+import { PreloaderProvider } from '../../providers/preloader/preloader';
 
 @IonicPage()
 @Component({
@@ -20,38 +21,41 @@ import { SignUpPage } from '../sign-up/sign-up';
   templateUrl: 'login.html',
 })
 export class LoginPage {
-  private currentUser: any;
-  private email: string;
-  private password: string;
-  private generateSecureKeyAlias: string = 'CByPOCfqJD';
-  private generateSecureIVAlias: string = 'akGoaW6ifP';
-  private secureKeyAlias: string = 'rRnrMSkc3x';
-  private secureIVAlias: string = 'wRHuW2DmiY';
-  private keepmeLoggedAlias: string = 'rkZvGqUbSs';
+  currentUser: any;
+  email: string;
+  password: string;
+  generateSecureKeyAlias: string = 'CByPOCfqJD';
+  generateSecureIVAlias: string = 'akGoaW6ifP';
+  secureKeyAlias: string = 'rRnrMSkc3x';
+  secureIVAlias: string = 'wRHuW2DmiY';
+  keepmeLoggedAlias: string = 'rkZvGqUbSs';
   
-  constructor(private navCtrl: NavController, private navParams: NavParams, private angularFireAuth: AngularFireAuth, 
-    private googleplus: GooglePlus, private facebook: Facebook, private platform: Platform, private auth : Authentication, 
-    private loadingCtrl: LoadingController, private utils: Utils, private http: HttpServiceProvider, 
-    private alertCtrl: AlertController, private storage: Storage, private aes256: AES256) { 
+  constructor(
+    public navCtrl: NavController, 
+    public navParams: NavParams, 
+    public angularFireAuth: AngularFireAuth, 
+    public googleplus: GooglePlus, 
+    public facebook: Facebook, 
+    public platform: Platform, 
+    public auth : Authentication, 
+    public utils: Utils, 
+    public http: HttpServiceProvider, 
+    public alertCtrl: AlertController, 
+    public storage: Storage, 
+    public aes256: AES256,
+    public loader: PreloaderProvider) { 
       this.auth.activeUser.subscribe((_user)=>{
         this.currentUser = _user;
       });
   }
 
   ionViewDidLoad() {
-    let loading = this.navParams.get('loading');
-
-    if(loading == null){
-      loading = this.loadingCtrl.create({
-        content: 'Please wait...'
-      });
-      loading.present();
-    }
+    this.loader.displayPreloader();
     
     if(this.platform.is('cordova')){
-      this.getDetailsKeepmeLogged(loading);
+      this.getDetailsKeepmeLogged();
     }else{
-      loading.dismiss();
+      this.loader.hidePreloader();
     }
     
   }
@@ -108,7 +112,7 @@ export class LoginPage {
       });
   }
 
-  getDetailsKeepmeLogged(loading) {
+  getDetailsKeepmeLogged() {
     let secureKey = null;
     let secureIV = null;
     let details = null;
@@ -126,17 +130,17 @@ export class LoginPage {
             
                 this.aes256.decrypt(secureKey, secureIV, details)
                   .then(res => {
-                    this.keepmeLogged(loading, res.split(','));
+                    this.keepmeLogged(res.split(','));
                   });
             });
           });
       }else{
-        loading.dismiss();
+        this.loader.hidePreloader();
       }
     });
   }
 
-  keepmeLogged(loading, details) {
+  keepmeLogged(details) {
     let auth = this.auth;
     let utils = this.utils;
     let login = this;
@@ -155,16 +159,16 @@ export class LoginPage {
       //Can't find the user
       if(data.details_customer.error){
         auth.doLogout();
-        loading.dismiss();
+        this.loader.hidePreloader();
         utils.showMessage(data.details_customer.message, 'error');
       //Found the user
       }else{
         login.setUserInfo(data.details_customer.customer);
         login.showMessage(data.info_messages);
-        login.goToShopPage(loading); 
+        login.goToShopPage(); 
       }
     }, err => {
-      loading.dismiss();
+      this.loader.hidePreloader();
       utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
     });
   }
@@ -178,10 +182,7 @@ export class LoginPage {
       let utils = this.utils;
       let http = this.http;
       let auth = this.auth;
-      let loading = this.loadingCtrl.create({
-        content: 'Please wait...'
-      });
-      loading.present();
+      this.loader.displayPreloader();
 
       //Signs in firebase
       this.angularFireAuth.auth.signInWithEmailAndPassword(this.email, this.password)
@@ -197,7 +198,7 @@ export class LoginPage {
                 //Can't find the user
                 if(data.details_customer.error){
                   auth.doLogout();
-                  loading.dismiss();
+                  this.loader.hidePreloader();
                   utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
                 //Found the user
                 }else{
@@ -206,20 +207,20 @@ export class LoginPage {
                   }
                   login.setUserInfo(data.details_customer.customer);
                   login.showMessage(data.info_messages);
-                  login.goToShopPage(loading); 
+                  login.goToShopPage(); 
                 }
               }, err => {
                 auth.doLogout();
-                loading.dismiss();
+                this.loader.hidePreloader();
                 utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
               });
           }else{
             auth.doLogout();
-            loading.dismiss();
+            this.loader.hidePreloader();
             utils.showMessage('Please validate your email address. Kindly check your inbox.', 'error');
           }
       }, function (err) {
-        loading.dismiss();
+        this.loader.hidePreloader();
         utils.showMessage(err.message, 'error');
       });
     }
@@ -239,10 +240,7 @@ export class LoginPage {
     let login = this;
     let auth = this.auth;
     let http = this.http;
-    let loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    loading.present();
+    this.loader.displayPreloader();
 
     const provider = new firebase.auth.GoogleAuthProvider();
     this.angularFireAuth.auth.signInWithPopup(provider)
@@ -259,7 +257,7 @@ export class LoginPage {
             //Can't find the user
             if(data.details_customer.error){
               auth.doLogout();
-              loading.dismiss();
+              this.loader.hidePreloader();
               utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
             //Found the user
             }else{
@@ -268,18 +266,18 @@ export class LoginPage {
               }
               login.setUserInfo(data.details_customer.customer);
               login.showMessage(data.info_messages);
-              login.goToShopPage(loading);
+              login.goToShopPage();
             }
         }, err => {
-          loading.dismiss();
+          this.loader.hidePreloader();
           utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
         });
     }, function (err) {
-      loading.dismiss();
+      this.loader.hidePreloader();
       utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
     })
     .catch( err => { 
-      loading.dismiss();
+      this.loader.hidePreloader();
       utils.showMessage(err.message, 'error');
     });
   }
@@ -290,10 +288,7 @@ export class LoginPage {
     let login = this;
     let auth = this.auth;
     let http = this.http;
-    let loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    loading.present();
+    this.loader.displayPreloader();
      
     this.googleplus.login({
       'webClientId': '97143556372-23j7cjinroqofsqboa8fs9i5qlqkqb14.apps.googleusercontent.com'
@@ -314,7 +309,7 @@ export class LoginPage {
                 //Can't find the user
                 if(data.details_customer.error){
                   auth.doLogout();
-                  loading.dismiss();
+                  this.loader.hidePreloader();
                   utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
                 //Found the user
                 }else{
@@ -323,20 +318,20 @@ export class LoginPage {
                   }
                   login.setUserInfo(data.details_customer.customer);
                   login.showMessage(data.info_messages);
-                  login.goToShopPage(loading);
+                  login.goToShopPage();
                 }
             }, err => {
-              loading.dismiss();
+              this.loader.hidePreloader();
               utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
             });
       })
       .catch( error => { 
-        loading.dismiss();
+        this.loader.hidePreloader();
         utils.showMessage(error, 'error');
       });
     })
     .catch( err => { 
-      loading.dismiss();
+      this.loader.hidePreloader();
       utils.showMessage(err.message, 'error');
     });
   }
@@ -347,10 +342,7 @@ export class LoginPage {
     let login = this;
     let auth = this.auth;
     let http = this.http;
-    let loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    loading.present();
+    this.loader.displayPreloader();
 
     this.facebook.login(['email'])
       .then( res => {
@@ -370,7 +362,7 @@ export class LoginPage {
                 //Can't find the user
                 if(data.details_customer.error){
                   auth.doLogout();
-                  loading.dismiss();
+                  this.loader.hidePreloader();
                   utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
                 //Found the user
                 }else{
@@ -379,40 +371,34 @@ export class LoginPage {
                   }
                   login.setUserInfo(data.details_customer.customer);
                   login.showMessage(data.info_messages);
-                  login.goToShopPage(loading);
+                  login.goToShopPage();
                 }
             }, err => {
-              loading.dismiss();
+              this.loader.hidePreloader();
               utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
             });
           })
           .catch( error => { 
-            loading.dismiss();
+            this.loader.hidePreloader();
             utils.showMessage(error, 'error');
           });
       })
       .catch( err => { 
-        loading.dismiss();
+        this.loader.hidePreloader();
         utils.showMessage(err.message, 'error');
       });
   }
 
   signUp() {
-    let loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    loading.present();
+    this.loader.displayPreloader();
 
-    this.navCtrl.push(SignUpPage, {'loading': loading});
+    this.navCtrl.push(SignUpPage);
   }
 
   resetPassword() {
-    let loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    loading.present();
+    this.loader.displayPreloader();
 
-    this.navCtrl.push(ResetPasswordPage, {'loading': loading});
+    this.navCtrl.push(ResetPasswordPage);
   }
 
   validateData() {
@@ -454,17 +440,16 @@ export class LoginPage {
     }
   }
 
-  goToShopPage(loading) {
+  goToShopPage() {
     if(this.currentUser.allowAccess){
       this.navCtrl.setRoot(ShopPage, {
-        'loading': loading,
         'showMenu': false,
-        'disableClosedShops': true
+        'disableClosedShops': true,
       });
     }else{
       this.utils.clearDetailsKeepmeLogged();
       this.auth.doLogout();
-      loading.dismiss();
+      this.loader.hidePreloader();
     }
   }
 }

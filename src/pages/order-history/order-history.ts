@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { HttpServiceProvider } from '../../providers/http-service/http-service';
 import { OrderDetailsPage } from '../order-details/order-details';
 import { Authentication } from '../../providers/auth/auth';
 import { Utils } from '../../utils/utils';
 import { ShopPage } from '../shop/shop';
 import { CheckoutPage } from '../checkout/checkout';
+import { PreloaderProvider } from '../../providers/preloader/preloader';
 
 @IonicPage()
 @Component({
@@ -18,8 +19,13 @@ export class OrderHistoryPage {
   orders: Array<{}>;
   isListRead: boolean = false;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public http: HttpServiceProvider,
-    public loadingCtrl: LoadingController, public auth: Authentication, public utils: Utils) { 
+  constructor(
+    public navCtrl: NavController, 
+    public navParams: NavParams, 
+    public http: HttpServiceProvider,
+    public auth: Authentication, 
+    public utils: Utils,
+    public loader: PreloaderProvider) { 
       this.auth.activeUser.subscribe(_user => {
         this.currentUser = _user;
       });
@@ -30,60 +36,43 @@ export class OrderHistoryPage {
     }
 
   ionViewDidLoad() {
-    let loading = this.navParams.get('loading');
-    if(loading == null){
-      let loading = this.loadingCtrl.create({
-        content: 'Please wait...'
-      });
-      loading.present();
-    }
-
-    this.loadData(loading);
+    this.loader.displayPreloader();
+    this.loadData();
   }
 
-  loadData(loading) {
+  loadData() {
     this.http.getOrderHistory(this.currentUser.id, this.currentShop.shopId)
       .subscribe(data => {
         this.isListRead = true;
         if(data.error){
           this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
-          loading.dismiss();
+          this.loader.hidePreloader();
         }else{
           this.orders = data.list; 
-          loading.dismiss();
+          this.loader.hidePreloader();
         }
       });
   }
 
   goToOrderDetails(id) {
-    let loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    loading.present();
+    this.loader.displayPreloader();
     
     this.navCtrl.push(OrderDetailsPage, {
       'orderId': id,
-      'loading': loading
     });
   }
 
   goToCheckoutPage() {
-    let loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    loading.present();
+    this.loader.displayPreloader();
 
     if(this.utils.isEmpty(this.currentShop.shopId)){
       this.navCtrl.setRoot(ShopPage, {
-        'loading': loading,
         'message': 'Before to proceed, please choose a shop.',
         'messageType': 'info',
-        'nextPage': 'Checkout'
+        'nextPage': 'Checkout',
       });
     }else{
-      this.navCtrl.setRoot(CheckoutPage, {
-        'loading': loading,
-      });
+      this.navCtrl.setRoot(CheckoutPage);
     }
   }
 }

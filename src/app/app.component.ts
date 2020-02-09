@@ -45,7 +45,7 @@ export class MyApp {
       { title: 'Menu', icon: 'list', component: MenuPage },
       { title: 'Change Shop', icon: 'home', component: ShopPage },
       { title: 'Contact us', icon: 'mail', component: ContactUsPage  },
-      { title: 'Login', icon: 'log-in', component: LoginPage }
+      { title: 'Login', icon: 'log-in', component: LoginPage },
     ];
     this.pagesUser = [
       { title: 'Profile', icon: 'person', component: ProfilePage },

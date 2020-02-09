@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import { HttpServiceProvider } from '../../providers/http-service/http-service';
 import { MenuPage } from '../menu/menu';
 import { CheckoutPage } from '../checkout/checkout';
 import { Utils } from '../../utils/utils';
 import { Authentication } from '../../providers/auth/auth';
+import { PreloaderProvider } from '../../providers/preloader/preloader';
 
 @IonicPage()
 @Component({
@@ -18,9 +19,14 @@ export class ShopPage {
   showMenu: boolean = false;
   disableClosedShops: boolean = false;
   
-  constructor(public navCtrl: NavController, public navParams: NavParams, public http: HttpServiceProvider,
-  	public auth: Authentication, public loadingCtrl: LoadingController, public alertCtrl: AlertController,
-  	public utils: Utils) {
+  constructor(
+    public navCtrl: NavController, 
+    public navParams: NavParams, 
+    public http: HttpServiceProvider,
+    public auth: Authentication, 
+    public alertCtrl: AlertController,
+    public utils: Utils,
+    public loader: PreloaderProvider) {
       this.auth.activeUser.subscribe(_user => {
         this.currentUser = _user;
       });
@@ -31,42 +37,30 @@ export class ShopPage {
   }
 
   ionViewDidLoad() {
-    let loading = this.navParams.get('loading');
-    if(loading == null){
-      loading = this.loadingCtrl.create({
-        content: 'Please wait...'
-      });
-      loading.present();
-    }
-    
-    this.loadData(loading);
-
+    this.loader.displayPreloader();
+    this.loadData();
     this.showMenu = this.navParams.get('showMenu') == null ? false : this.navParams.get('showMenu');
     this.disableClosedShops = this.navParams.get('disableClosedShops') == null ? false : this.navParams.get('disableClosedShops');
   }
 
-  loadData(loading) {
+  loadData() {
     this.http.listShops(false)
       .subscribe(data => { 
         if(data.error){
-          loading.dismiss();
+          this.loader.hidePreloader();
           this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
         }else{
           this.shops = data.list
-          loading.dismiss();
+          this.loader.hidePreloader();
         }
       });
   }
 
   confirmShop(shop) {
-    let loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    loading.present();
+    this.loader.displayPreloader();
     
     let navCtrl = this.navCtrl;
     let auth = this.auth;
-
     this.currentShop.shopId = shop.id;
     this.currentShop.shopName = shop.name;
     this.currentShop.shopUrl = shop.url;
@@ -79,35 +73,29 @@ export class ShopPage {
       this.http.getShoppingCart(this.currentUser.id, this.currentShop.shopId)
       .subscribe(data => { 
         auth.setShop(this.currentShop);
-        navCtrl.setRoot(MenuPage, {'loading': loading});
+        navCtrl.setRoot(MenuPage);
       }, err => {
-        loading.dismiss();
+        this.loader.hidePreloader();
         this.utils.showMessage('It was not possible complete the request. Please try again later...', 'error');
       });
     }else{
       auth.setShop(this.currentShop);
-      navCtrl.setRoot(MenuPage, {'loading': loading});
-      loading.dismiss();
+      navCtrl.setRoot(MenuPage);
+      this.loader.hidePreloader();
     }
   }
 
   goToCheckoutPage() {
-    let loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    loading.present();
+    this.loader.displayPreloader();
 
     if(this.utils.isEmpty(this.currentShop.shopId)){
       this.navCtrl.setRoot(ShopPage, {
-        'loading': loading,
         'message': 'Before to proceed, please choose a shop.',
         'messageType': 'info',
-        'nextPage': 'Checkout'
+        'nextPage': 'Checkout',
       });
     }else{
-      this.navCtrl.setRoot(CheckoutPage, {
-        'loading': loading,
-      });
+      this.navCtrl.setRoot(CheckoutPage);
     }
   }
 

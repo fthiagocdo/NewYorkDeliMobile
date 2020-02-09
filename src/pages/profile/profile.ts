@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { Authentication } from '../../providers/auth/auth';
 import { HttpServiceProvider } from '../../providers/http-service/http-service';
 import { Utils } from '../../utils/utils';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { CheckoutPage } from '../checkout/checkout';
+import { PreloaderProvider } from '../../providers/preloader/preloader';
 
 @IonicPage()
 @Component({
@@ -24,9 +25,14 @@ export class ProfilePage {
   address: string;
   receiveNotifications: boolean;
   
-  constructor(public navCtrl: NavController, public navParams: NavParams, public auth: Authentication, 
-    public http: HttpServiceProvider, public loadingCtrl: LoadingController, public utils: Utils, 
-    public angularFireAuth: AngularFireAuth) {
+  constructor(
+    public navCtrl: NavController, 
+    public navParams: NavParams, 
+    public auth: Authentication, 
+    public http: HttpServiceProvider, 
+    public utils: Utils, 
+    public angularFireAuth: AngularFireAuth,
+    public loader: PreloaderProvider) {
       this.auth.activeUser.subscribe(_user => {
         this.currentUser = _user;
         this.name = _user.name;
@@ -48,10 +54,7 @@ export class ProfilePage {
   }
 
   ionViewDidLoad() {
-    let loading = this.navParams.get('loading');
-    if(loading != null){
-      loading.dismiss();
-    }
+    this.loader.hidePreloader();
   }
 
   confirm() {
@@ -61,19 +64,14 @@ export class ProfilePage {
       let utils = this.utils;
       let auth = this.auth;
       let http = this.http;
-
-      let loading = this.loadingCtrl.create({
-        content: 'Please wait...'
-      });
-      loading.present();
-  
+      this.loader.displayPreloader();
       
       //Updates user in the api
       http.updateUser(currentUser)
         .subscribe(data => {
           //Error update user in the app
           if(data.error){
-            loading.dismiss();
+            this.loader.hidePreloader();
             utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
           }else{
             //Update password in firebase
@@ -82,22 +80,22 @@ export class ProfilePage {
                 .then(credential => {
                   //Success update password in firebase
                   auth.doLogin(currentUser);
-                  loading.dismiss();
+                  this.loader.hidePreloader();
                   utils.showMessage(data.message, 'info');
                 }, err => {
                   //Error update password in firebase
-                  loading.dismiss();
+                  this.loader.hidePreloader();
                   utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
                 });
             }else{
               //Update user info
               auth.doLogin(currentUser);
-              loading.dismiss();
+              this.loader.hidePreloader();
               utils.showMessage(data.message, 'info');
             }
           }
         }, err => {
-          loading.dismiss();
+          this.loader.hidePreloader();
           utils.showMessage('It was not possible complete the request. Please try again later...', 'error');
         });
       }
@@ -131,13 +129,7 @@ export class ProfilePage {
   }
 
   goToCheckoutPage() {
-    let loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    loading.present();
-
-    this.navCtrl.setRoot(CheckoutPage, {
-        'loading': loading,
-      });
+    this.loader.displayPreloader();
+    this.navCtrl.setRoot(CheckoutPage);
   }
 }

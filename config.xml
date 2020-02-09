@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.ftc.newyorkdeli" version="2.4.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.ftc.newyorkdeli" version="2.4.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>New York Deli</name>
     <description>Order your favorite food at the New York Deli.</description>
-    <author email="ftcdevsolutions@gmail.com" href="http://ftcdevsolutions.com/">FTC Dev Solutions</author>
+    <author email="ftcdevsolutions@gmail.com" href="http://www.ftcdevsolutions.com/">FTC Dev Solutions</author>
     <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
@@ -24,6 +24,7 @@
     <preference name="AutoHideSplashScreen" value="false" />
     <preference name="ShowSplashScreen" value="true" />
     <preference name="ShowSplashScreenSpinner" value="false" />
+    <custom-preference name="android-manifest/application/@android:usesCleartextTraffic" value="true" />
     <platform name="ios">
         <icon height="57" src="resources/ios/icon/icon.png" width="57" />
         <icon height="114" src="resources/ios/icon/icon@2x.png" width="114" />
@@ -111,5 +112,7 @@
         <variable name="REVERSED_CLIENT_ID" value="com.googleusercontent.apps.97143556372-i118d3shl7m97373hjkfptt7i27f6u2s" />
         <variable name="PLAY_SERVICES_VERSION" value="11.8.0" />
     </plugin>
+    <plugin name="cordova-custom-config" spec="^5.1.0" />
     <engine name="ios" spec="^4.5.5" />
+    <engine name="android" spec="^7.1.4" />
 </widget>

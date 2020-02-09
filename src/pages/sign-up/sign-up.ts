@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { Authentication } from '../../providers/auth/auth';
 import { Utils } from '../../utils/utils';
 import { HttpServiceProvider } from '../../providers/http-service/http-service';
 import { LoginPage } from '../login/login';
 import * as firebase from 'firebase';
+import { PreloaderProvider } from '../../providers/preloader/preloader';
 
 @IonicPage()
 @Component({
@@ -19,27 +20,27 @@ export class SignUpPage {
   password: string = '';
   confirmPassword: string = '';
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public angularFireAuth: AngularFireAuth, 
-    public auth : Authentication, public loadingCtrl: LoadingController, public alertCtrl: AlertController, 
-    public utils: Utils, public http: HttpServiceProvider) {
+  constructor(
+    public navCtrl: NavController, 
+    public navParams: NavParams, 
+    public angularFireAuth: AngularFireAuth, 
+    public auth : Authentication, 
+    public alertCtrl: AlertController, 
+    public utils: Utils, 
+    public http: HttpServiceProvider,
+    public loader: PreloaderProvider) {
       this.auth.activeUser.subscribe(_user => {
         this.currentUser = _user;
       });
   }
 
   ionViewDidLoad() {
-    let loading = this.navParams.get('loading');
-    if(loading != null){
-      loading.dismiss();
-    }
+    this.loader.hidePreloader();
   }
 
   confirm() {
     if(this.validateData()){
-      let loading = this.loadingCtrl.create({
-        content: 'Please wait...'
-      });
-      loading.present();
+      this.loader.displayPreloader();
       
       this.currentUser.email = this.email;
       this.currentUser.password = this.password;
@@ -59,10 +60,11 @@ export class SignUpPage {
           //Signs up in the api
           http.findOrCreateUser(currentUser)
             .subscribe(data => {
+              utils.showMessage(JSON.stringify(data), 'error');
               //Can't sign up in the api
               if(data.details_customer.error){
-                loading.dismiss();
-                utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
+                this.loader.hidePreloader();
+                utils.showMessage('1It was no possible complete your request. Please try again later...'+data.details_customer.error, 'error');
               //Signs up in the api successfully
               }else{
                 let firebaseUser = firebase.auth().currentUser;
@@ -72,7 +74,7 @@ export class SignUpPage {
                     currentUser.receiveNotifications = data.details_customer.customer.receive_notifications == '1' ? true : false;
                     currentUser.photo = "/assets/imgs/user.png";
                     utils.showMessage('Please validate your email address. Kindly check your inbox.', 'info');
-                    navCtrl.setRoot(LoginPage, {'loading': loading});
+                    navCtrl.setRoot(LoginPage);
                   } 
                 ).catch(
                   (err) => {
@@ -81,11 +83,11 @@ export class SignUpPage {
                 ) 
               }
             }, err => {
-              loading.dismiss();
-              utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
+              this.loader.hidePreloader();
+              utils.showMessage('2It was no possible complete your request. Please try again later...'+err, 'error');
             });
       }, function (err) {
-        loading.dismiss();
+        this.loader.hidePreloader();
         utils.showMessage(err.message, 'error');
       }); 
     }

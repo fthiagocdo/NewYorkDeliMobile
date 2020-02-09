@@ -1,16 +1,10 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import { Authentication } from '../../providers/auth/auth';
 import { HttpServiceProvider } from '../../providers/http-service/http-service';
 import { Utils } from '../../utils/utils';
-import { PaymentPage } from '../payment/payment';
-
-/**
- * Generated class for the CheckoutCollectPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
+import { PaymentIframePage } from '../payment-iframe/payment-iframe';
+import { PreloaderProvider } from '../../providers/preloader/preloader';
 
 @IonicPage()
 @Component({
@@ -27,9 +21,14 @@ export class CheckoutCollectPage {
   time: string;
   amount: string;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public http: HttpServiceProvider,
-    public auth: Authentication, public loadingCtrl: LoadingController, public alertCtrl: AlertController,
-    public utils: Utils) { 
+  constructor(
+    public navCtrl: NavController, 
+    public navParams: NavParams, 
+    public http: HttpServiceProvider,
+    public auth: Authentication, 
+    public alertCtrl: AlertController,
+    public utils: Utils,
+    public loader: PreloaderProvider) { 
       this.auth.activeUser.subscribe(_user => {
         this.currentUser = _user;
         if(_user.phone != 'null'){
@@ -46,17 +45,14 @@ export class CheckoutCollectPage {
     }
 
   ionViewDidLoad() {
-    let loading = this.navParams.get('loading');
-    if(loading != null){
-      loading.dismiss();
-    }
+    this.loader.displayPreloader();
 
     this.amount = this.navParams.get("amount");
 
     this.http.getLimitTimeOrder(this.currentShop.shopId)
       .subscribe(data => {
         if(data.error){
-          loading.dismiss();
+          this.loader.hidePreloader();
           this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
         }else{
           data.hourValues.forEach(hour => {
@@ -68,7 +64,7 @@ export class CheckoutCollectPage {
           });
         }
       }, err => {
-        loading.dismiss();
+        this.loader.hidePreloader();
         this.utils.showMessage('It was not possible complete the request. Please try again later...', 'error');
       });
   }
@@ -77,11 +73,8 @@ export class CheckoutCollectPage {
     if(this.isCustomerDetailsDifferent()){
       this.showYesNoDialog();
     }else{
-      let loading = this.loadingCtrl.create({
-        content: 'Please wait...'
-      });
-      loading.present();
-      this.confirmCollect(loading);
+      this.loader.displayPreloader();
+      this.confirmCollect();
     }
   }
 
@@ -103,21 +96,15 @@ export class CheckoutCollectPage {
         text: 'No, thank you',
         cssClass: 'primary-color',
         handler: () => {
-          let loading = this.loadingCtrl.create({
-            content: 'Please wait...'
-          });
-          loading.present();
-          this.confirmCollect(loading);
+          this.loader.displayPreloader();
+          this.confirmCollect();
         }
       }, {
         text: 'Yes, please',
         cssClass: 'primary-color',
         handler: () => {
-          let loading = this.loadingCtrl.create({
-            content: 'Please wait...'
-          });
-          loading.present();
-          this.saveDetails(loading);
+          this.loader.displayPreloader();
+          this.saveDetails();
         }
       }],
       cssClass: 'primary-color'
@@ -125,7 +112,7 @@ export class CheckoutCollectPage {
     alert.present();
   }
 
-  saveDetails(loading){
+  saveDetails(){
     this.currentUser.name = this.name;
     this.currentUser.phone = this.phone;
     //Updates user in the api
@@ -133,35 +120,34 @@ export class CheckoutCollectPage {
       .subscribe(data => {
         //Error update user in the app
         if(data.error){
-          loading.dismiss();
+          this.loader.hidePreloader();
           this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
         }else{
-          this.confirmCollect(loading);
+          this.confirmCollect();
         }
       }
       , err => {
         //Error update password in firebase
-        loading.dismiss();
+        this.loader.hidePreloader();
         this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
       });
   }
 
-  confirmCollect(loading) {
+  confirmCollect() {
     this.http.confirmCheckout(this.currentUser.id, this.currentShop.shopId, "collect", this.time, this.name,
       this.phone, null, null, null)
       .subscribe(data => {
         if(data.error){
-          loading.dismiss();
+          this.loader.hidePreloader();
           this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
         }else{
-          this.navCtrl.push(PaymentPage, {
+          this.navCtrl.push(PaymentIframePage, {
             'userId': this.currentUser.id,
             'amount': this.amount,
-            'loading': loading
           });
         }
       }, err => {
-        loading.dismiss();
+        this.loader.hidePreloader();
         this.utils.showMessage('It was not possible complete the request. Please try again later...', 'error');
       });
   }
