@@ -80,27 +80,37 @@ export class MenuItemPage {
             this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
           }else{
             let menuExtras = data.list;
-            //No menuExtras. Add the item to the cart.
-            if(menuExtras.length == 0){
-              this.http.addMenuItem(this.currentUser.id, this.currentShop.shopId, menuItemId, menuExtras)
+            this.http.getMenuChoices(menuItemId)
               .subscribe(data => { 
                 if(data.error){
                   this.loader.hidePreloader();
                   this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
                 }else{
-                  this.navCtrl.setRoot(MenuPage, {
-                    'itemAdded': true,
-                    'message': data.message,
-                  });
+                  let menuChoices = data.list;
+                  //No menuExtras and no menuChoices. Add the item to the cart.
+                  if(menuExtras.length == 0 && menuChoices.length == 0){
+                    this.http.addMenuItem(this.currentUser.id, this.currentShop.shopId, menuItemId, menuExtras, menuChoices)
+                      .subscribe(data => { 
+                        if(data.error){
+                          this.loader.hidePreloader();
+                          this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
+                        }else{
+                          this.navCtrl.setRoot(MenuPage, {
+                            'itemAdded': true,
+                            'message': data.message,
+                          });
+                        }
+                      });
+                  }else{
+                    //Show menuExtras list for the item
+                    this.navCtrl.push(MenuExtraPage, {
+                      'menuItemId': menuItemId,
+                      'menuExtras': menuExtras,
+                      'menuChoices': menuChoices,
+                    });
+                  }
                 }
               });
-            }else{
-              //Show menuExtras list for the item
-              this.navCtrl.push(MenuExtraPage, {
-                'menuItemId': menuItemId,
-                'menuExtras': menuExtras,
-              });
-            }
           }
         });
     }

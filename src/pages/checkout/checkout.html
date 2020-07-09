@@ -7,7 +7,7 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
+<ion-content>
   <ion-card class="checkout-card" *ngIf="partialValue == 0">
     <ion-item class="checkout-total">
       <p class="primary-color" text-center>Your cart is empty.</p>
@@ -15,9 +15,10 @@
   </ion-card>
 
   <ion-card *ngFor="let item of checkoutItems">
+    <p class="primary-color item-title"><b>{{ item.menu_item.name }}</b></p>
     <ion-item class="checkout-item">
-      <h1 class="primary-color"><b>{{ item.menu_item.name }}</b></h1>
       <p class="primary-color"><b>Type: </b>{{ item.menu_item.type.name }}</p>
+      <p padding-left class="primary-color" *ngFor="let choice of item.checkout_item_choices">{{ choice.menu_choice.name }}: {{ choice.menu_choice_item.name }}</p>
       <p class="primary-color" *ngIf="item.checkout_item_extras.length > 0"><b>Extras: </b></p>
       <p padding-left class="primary-color" *ngFor="let extra of item.checkout_item_extras">{{ extra.menu_extra.name }}</p>
       <p class="primary-color"><span float-left style="margin-top: 4px;"><b>Quantity: </b></span>
@@ -106,6 +107,6 @@
         </ion-row>
       </ion-grid>
     </ion-list>
-    <div padding *ngIf="partialValue > 0"><button ion-button full round (click)="confirmCheckout()">Confirm</button></div>
+    <div padding *ngIf="partialValue > 0"><button ion-button full round (click)="setNextPage(true)">Confirm</button></div>
   </div>
 </ion-content>

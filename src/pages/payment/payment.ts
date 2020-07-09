@@ -281,7 +281,7 @@ export class PaymentPage {
                       loading.dismiss();
                       this.utils.showMessage('It was no possible complete your request. Please, verify your card details or try again later...', 'error');
                     }else{
-                      this.http.paymentConfirmation(this.currentUser.id, this.currentShop.shopId, this.currentUser.email, data['transactionId'], data['retrievalReference'])
+                      /*this.http.paymentConfirmation(this.currentUser.id, this.currentShop.shopId, this.currentUser.email, data['transactionId'], data['retrievalReference'])
                         .subscribe(data => {
                           if(data.error){
                             loading.dismiss();
@@ -295,7 +295,7 @@ export class PaymentPage {
                         }, err => {
                           loading.dismiss();
                           this.utils.showMessage('It was no possible complete your request. Please, verify your card details or try again later...', 'error');
-                        });
+                        });*/
                     }
                   }, err => {
                     loading.dismiss();

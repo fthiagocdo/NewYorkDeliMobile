@@ -7,8 +7,9 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content scroll="true" overflow-scroll="true" class="iframe-wrapper">
+<ion-content scroll="false" overflow-scroll="false" class="iframe-wrapper">
   <button style="display: none !important;" ion-button full round (click)="returnToApp()" id="buttonreturntoapp">Return to app</button>
-  <input type="hidden" id="results" value="">
-  <iframe id="externaliframe" data-tap-disabled="true" width="100%" height="100%" frameborder="0" src="http://www.ftcdevsolutions.com/site/iframe"></iframe>
+  <div class="iframe-border">
+    <iframe id="externaliframe" class="hidden" data-tap-disabled="true" width="100%" height="100%" frameborder="0" [src]="url"></iframe>
+  </div>
 </ion-content>

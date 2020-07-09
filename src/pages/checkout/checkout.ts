@@ -7,6 +7,7 @@ import { Utils } from '../../utils/utils';
 import { Authentication } from '../../providers/auth/auth';
 import { CheckoutCollectPage } from '../checkout-collect/checkout-collect';
 import { PreloaderProvider } from '../../providers/preloader/preloader';
+import { PaymentIframePage } from '../payment-iframe/payment-iframe';
 
 @IonicPage()
 @Component({
@@ -24,6 +25,7 @@ export class CheckoutPage {
   deliverOrCollect: string;
   delivery: boolean;
   checkoutMessage: string;
+  checkoutId: string;
   
   constructor(public navCtrl: NavController, 
     public navParams: NavParams, 
@@ -55,14 +57,20 @@ export class CheckoutPage {
   loadData() {
     this.http.getShoppingCart(this.currentUser.id, this.currentShop.shopId)
       .subscribe(data => { 
-        this.partialValue = data.checkout.partial_value;
-        this.deliverOrCollect = data.checkout.deliver_or_collect;
-        this.deliveryFee = data.checkout.delivery_fee;
-        this.riderTip = data.checkout.rider_tip;
-        this.totalValue = data.checkout.total_value;
-        this.checkoutItems = data.checkout.checkout_items;
-        this.checkoutMessage = data.checkout.checkout_message;
-        this.loader.hidePreloader();
+        if(data.error){
+          this.loader.hidePreloader();
+          this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
+        }else{
+          this.partialValue = data.checkout.partial_value;
+          this.deliverOrCollect = data.checkout.deliver_or_collect;
+          this.deliveryFee = data.checkout.delivery_fee;
+          this.riderTip = data.checkout.rider_tip;
+          this.totalValue = data.checkout.total_value;
+          this.checkoutItems = data.checkout.checkout_items;
+          this.checkoutMessage = data.checkout.checkout_message;
+          this.checkoutId = data.checkout.id;
+          this.loader.hidePreloader();
+        }
       }, err => {
         this.loader.hidePreloader();
         this.utils.showMessage('It was not possible complete the request. Please try again later...', 'error');
@@ -186,25 +194,19 @@ export class CheckoutPage {
     );
   }
 
-  confirmCheckout() {
-    this.loader.displayPreloader();
-
-    this.saveSomethingElseMessage(true);   
-  }
-
   setNextPage(confirmCheckout){
     if(confirmCheckout){
       if(this.deliverOrCollect == 'deliver_address'){
         this.navCtrl.push(CheckoutAddressPage, {
-          'amount': this.totalValue,
+          'checkoutId': this.checkoutId,
         });
       }else if(this.deliverOrCollect == 'deliver_table'){
           this.navCtrl.push(CheckoutTablePage, {
-            'amount': this.totalValue,
+            'checkoutId': this.checkoutId,
           });
       }else{
         this.navCtrl.push(CheckoutCollectPage, {
-          'amount': this.totalValue,
+          'checkoutId': this.checkoutId,
         });
       }
     }else{

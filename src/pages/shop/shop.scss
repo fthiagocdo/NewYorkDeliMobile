@@ -1,8 +1,33 @@
-p {
-    padding-left: 15px;
-}
+page-shop {
+    .grid {
+        padding: 10px;
+    }
 
-.shop_closed {
-    font-style: italic;
-    color: grey !important;
+    .ftc-radio {
+        display: flex; 
+        align-items: center; 
+        padding: 0px; 
+        max-width: 11%;
+    }
+
+    .radio {
+        padding-left: 10px;
+    }
+
+    p {
+        padding-left: 5px; 
+        padding-top: 5px; 
+        margin: 0px; 
+        font-size: 1.5rem; 
+    }
+
+    .title {
+        font-size: 2rem; 
+        font-weight: 500;
+    }
+
+    .shop_closed {
+        font-style: italic;
+        color: grey !important;
+    }
 }

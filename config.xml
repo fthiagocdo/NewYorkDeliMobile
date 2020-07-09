@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.ftc.newyorkdeli" version="2.4.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.ftc.newyorkdeli" version="2.5.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>New York Deli</name>
     <description>Order your favorite food at the New York Deli.</description>
     <author email="ftcdevsolutions@gmail.com" href="http://www.ftcdevsolutions.com/">FTC Dev Solutions</author>

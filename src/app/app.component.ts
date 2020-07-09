@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { Nav, Platform, LoadingController } from 'ionic-angular';
+import { Nav, Platform } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
@@ -12,6 +12,8 @@ import { OrderHistoryPage } from '../pages/order-history/order-history';
 import { CheckoutPage } from '../pages/checkout/checkout';
 import { Authentication } from '../providers/auth/auth';
 import { Utils } from '../utils/utils';
+import { PaymentIframePage } from '../pages/payment-iframe/payment-iframe';
+import { PreloaderProvider } from '../providers/preloader/preloader';
 
 @Component({
   templateUrl: 'app.html'
@@ -25,8 +27,13 @@ export class MyApp {
   currentShop: any;
   showSplash: boolean = true;
 
-  constructor(public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen, 
-    public auth : Authentication, public loadingCtrl: LoadingController, public utils: Utils) { 
+  constructor(
+    public platform: Platform, 
+    public statusBar: StatusBar, 
+    public splashScreen: SplashScreen, 
+    public auth : Authentication, 
+    public loader: PreloaderProvider, 
+    public utils: Utils) { 
     this.initializeApp();
 
     this.auth.activeUser.subscribe((_user)=>{
@@ -43,7 +50,7 @@ export class MyApp {
   loadData() {
     this.pagesGuest = [
       { title: 'Menu', icon: 'list', component: MenuPage },
-      { title: 'Change Shop', icon: 'home', component: ShopPage },
+      { title: 'Change Deli', icon: 'home', component: ShopPage },
       { title: 'Contact us', icon: 'mail', component: ContactUsPage  },
       { title: 'Login', icon: 'log-in', component: LoginPage },
     ];
@@ -65,29 +72,24 @@ export class MyApp {
   }
 
   openPage(page) {
-    let loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    loading.present();
+    this.loader.displayPreloader();
     
     if(page.title == 'Logout'){
       this.auth.doLogout();
       this.utils.clearDetailsKeepmeLogged();
-      this.nav.setRoot(LoginPage, {'loading': loading});
-    }else if(page.title == 'Menu' && this.utils.isEmpty(this.currentShop.shopId)){
-      this.nav.setRoot(ShopPage, {
-        'loading': loading,
-        'showMenu': false,
-        'disableClosedShops': false
-      });
+      this.nav.setRoot(LoginPage);
+    }else if((page.title == 'Menu' || page.title == 'Checkout' || page.title == 'Order History') 
+      && this.utils.isEmpty(this.currentShop.shopId)){
+        this.nav.setRoot(ShopPage, {
+          'disableClosedShops': false
+        });
     }else if(page.title == 'Change Shop'){
       this.nav.setRoot(ShopPage, {
-        'loading': loading,
         'showMenu': true,
         'disableClosedShops': false
       });
     }else{
-      this.nav.setRoot(page.component, {'loading': loading});
+      this.nav.setRoot(page.component);
     }
   }
 }

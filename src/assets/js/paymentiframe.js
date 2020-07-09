@@ -9,17 +9,16 @@ function bindEvent(element, eventName, eventHandler) {
 
 // Listen to message from child window
 bindEvent(window, 'message', function (e) {
-    results.value = e.data;
     externaliframe.classList.add('hide');
     eventFire(buttonreturntoapp, 'click');
 });
 
 function eventFire(el, etype){
-    if (el.fireEvent) {
-      el.fireEvent('on' + etype);
-    } else {
-      var evObj = document.createEvent('Events');
-      evObj.initEvent(etype, true, false);
-      el.dispatchEvent(evObj);
-    }
+  if (el.fireEvent) {
+    el.fireEvent('on' + etype);
+  } else {
+    var evObj = document.createEvent('Events');
+    evObj.initEvent(etype, true, false);
+    el.dispatchEvent(evObj);
   }
+}

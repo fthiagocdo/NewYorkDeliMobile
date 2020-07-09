@@ -1,29 +1,26 @@
 <ion-header>
   <ion-navbar>
-    <button ion-button menuToggle *ngIf="showMenu">
+    <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
     <ion-title class="ftc-dusty-font" style="font-size: 200%; margin-left: 15px;">Choose a deli</ion-title>
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
-  <ion-card *ngFor="let shop of shops">
-    <ion-card-content>
-      <ng-template [ngIf]="shop.available || !disableClosedShops" [ngIfElse]="notOpened">
-          <ion-item>
-            <ion-label class="primary-color bold">{{ shop.name }}</ion-label>
-            <ion-radio value="{{ shop.id }}" (ionSelect)="confirmShop(shop)"></ion-radio>
-          </ion-item>
-          <p>{{ shop.address }}</p>
-        </ng-template>
-        <ng-template #notOpened>
-          <ion-item>
-            <ion-label class="primary-color bold">{{ shop.name }}</ion-label>
-          </ion-item>
-          <p>{{ shop.address }}</p>
-          <p class="shop_closed">This shop is closed at this moment.</p>
-      </ng-template>
-    </ion-card-content>
-  </ion-card>
+<ion-content> 
+  <ion-grid>
+    <ion-row *ngFor="let shop of shops">
+      <ion-col class="ftc-dusty-font ftc-button-menu ftc-radio">
+        <ion-radio *ngIf="shop.available" value="{{ shop.id }}" (ionSelect)="confirmShop(shop)"></ion-radio>
+        <button *ngIf="!shop.available" ion-button icon-only clear>
+          <ion-icon name="close-circle"></ion-icon>
+        </button>
+      </ion-col>
+      <ion-col class="ftc-dusty-font ftc-button-menu">
+        <p class="title">{{ shop.name }}</p>
+        <p>{{ shop.address }}</p>
+        <p *ngIf="!shop.available" class="shop_closed">This deli is closed at this moment.</p>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

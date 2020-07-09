@@ -11,8 +11,8 @@
 
 <ion-content padding>
     <ion-card *ngFor="let item of checkoutItems">
+      <p class="primary-color item-title"><b>{{ item.name }}</b></p>
       <ion-item class="checkout-item">
-        <h1 class="primary-color"><b>{{ item.name }}</b></h1>
         <p class="primary-color"><b>Type: </b>{{ item.type }}</p>
         <p class="primary-color" *ngIf="item.checkoutItemExtras.length > 0"><b>Extras: </b></p>
         <p padding-left class="primary-color" *ngFor="let extra of item.checkoutItemExtras">{{ extra.name }}</p>

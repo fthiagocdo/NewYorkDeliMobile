@@ -19,7 +19,7 @@ export class CheckoutCollectPage {
   hourValues: string = "";
   minuteValues: string = "";
   time: string;
-  amount: string;
+  checkoutId: string;
 
   constructor(
     public navCtrl: NavController, 
@@ -47,12 +47,13 @@ export class CheckoutCollectPage {
   ionViewDidLoad() {
     this.loader.displayPreloader();
 
-    this.amount = this.navParams.get("amount");
+    this.checkoutId = this.navParams.get("checkoutId");
 
     this.http.getLimitTimeOrder(this.currentShop.shopId)
       .subscribe(data => {
+        this.loader.hidePreloader();
+
         if(data.error){
-          this.loader.hidePreloader();
           this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
         }else{
           data.hourValues.forEach(hour => {
@@ -139,14 +140,14 @@ export class CheckoutCollectPage {
       .subscribe(data => {
         if(data.error){
           this.loader.hidePreloader();
-          this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
+          this.utils.showMessage(data.message, 'error');
         }else{
           this.navCtrl.push(PaymentIframePage, {
-            'userId': this.currentUser.id,
-            'amount': this.amount,
+            'checkoutId': this.checkoutId,
           });
         }
       }, err => {
+        console.log(err);
         this.loader.hidePreloader();
         this.utils.showMessage('It was not possible complete the request. Please try again later...', 'error');
       });

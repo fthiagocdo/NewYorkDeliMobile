@@ -16,8 +16,10 @@ import { PreloaderProvider } from '../../providers/preloader/preloader';
 export class MenuExtraPage {
   currentUser: any;
   currentShop: any;
-  menuExtras: Array<string>;
+  menuExtras: Array<{}>;
+  menuChoices: Array<any>;
   selectedExtras: Array<{}>;
+  selectedChoices: Array<any>;
   menuItemId:string;
 
   constructor(
@@ -37,8 +39,21 @@ export class MenuExtraPage {
 
   ionViewDidLoad() {
     this.selectedExtras = new Array();
+    this.selectedChoices = new Array();
+
     this.menuItemId = this.navParams.get('menuItemId');
     this.menuExtras = this.navParams.get('menuExtras');
+    this.menuChoices = this.navParams.get('menuChoices');
+
+    this.menuChoices.forEach(menuChoice => {
+      let selectedChoice = {
+        id: menuChoice.id,
+        name: menuChoice.name,
+        menuChoiceItemId: null
+      };
+      this.selectedChoices.push(selectedChoice);
+    });
+    
     this.loader.hidePreloader();
   }
 
@@ -52,22 +67,46 @@ export class MenuExtraPage {
       this.selectedExtras.splice(indexOf, 1);
     }
   }
+
+  addMenuChoice(menuChoiceId, menuChoiceItemId) {
+    let count = 0;
+    this.selectedChoices.forEach(selectedChoice => {
+      if(selectedChoice.id == menuChoiceId) {
+        this.selectedChoices[count].menuChoiceItemId = menuChoiceItemId;
+      }
+      count++;
+    });
+  }
   
   confirm() {
-    this.loader.displayPreloader();
+    if(this.validateChoices()) {
+      this.loader.displayPreloader();
+      this.http.addMenuItem(this.currentUser.id, this.currentShop.shopId, this.menuItemId, this.selectedExtras, this.selectedChoices)
+        .subscribe(data => { 
+          if(data.error){
+            this.loader.hidePreloader();
+            this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
+          }else{
+            this.navCtrl.setRoot(MenuPage, {
+              'itemAdded': true,
+              'message': data.message,
+            });
+          }
+        });
+    }
+  }
 
-    this.http.addMenuItem(this.currentUser.id, this.currentShop.shopId, this.menuItemId, this.selectedExtras)
-      .subscribe(data => { 
-        if(data.error){
-          this.loader.hidePreloader();
-          this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
-        }else{
-          this.navCtrl.setRoot(MenuPage, {
-            'itemAdded': true,
-            'message': data.message,
-          });
-        }
-      });
+  validateChoices() {
+    let valid = true;
+
+    this.selectedChoices.forEach(selectedChoice => {
+      if(valid == true && selectedChoice.menuChoiceItemId == null) {
+        valid = false;
+        this.utils.showMessage("Please, select "+selectedChoice.name+".", 'error');
+      }
+    });
+
+    return valid;
   }
 
   goToCheckoutPage() {

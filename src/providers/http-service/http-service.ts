@@ -94,6 +94,13 @@ export class HttpServiceProvider {
       });
   }
 
+  getMenuChoices(menuitemId) {
+    return this.http.get(this.url+'menuchoice/all/'+menuitemId)
+      .map(res => {
+        return res.json()
+      });
+  }
+
   getOrderHistory(userId, shopId) {
     return this.http.get(this.url+'orderhistory/all/'+userId+'/'+shopId)
       .map(res => {
@@ -129,7 +136,7 @@ export class HttpServiceProvider {
       });
   }
 
-  addMenuItem(userId, shopId, menuItemId, menuExtras) {
+  addMenuItem(userId, shopId, menuItemId, menuExtras, menuChoices) {
     let listMenuExtras = '';
     let count = 1;
     menuExtras.forEach(menuExtraId => {
@@ -139,10 +146,22 @@ export class HttpServiceProvider {
         listMenuExtras += ',';
       }     
     });
+
+    let listMenuChoices = '';
+    count = 1;
+    menuChoices.forEach(menuChoice => {
+      listMenuChoices += menuChoice.id+','+menuChoice.menuChoiceItemId;
+      count++;
+      if(count <= menuChoices.length){
+        listMenuChoices += ',';
+      }     
+    });
+
     return this.http.get(this.url+'checkout/additem/'+userId+'/'+shopId, {
       params: {
         menuitem_id: menuItemId,
-        menuExtras: listMenuExtras
+        menuExtras: listMenuExtras,
+        menuChoices: listMenuChoices,
       }})
       .map(res => {
         return res.json()
@@ -244,7 +263,7 @@ export class HttpServiceProvider {
   }
 
   getLimitTimeOrder(shopId) {
-    return this.http.get(this.url+'checkout/getLimitTimeOrder/'+shopId)
+    return this.http.get(this.url+'checkout/getlimittimeorder/'+shopId)
       .map(res => {
         return res.json()
       });
@@ -257,14 +276,8 @@ export class HttpServiceProvider {
       });
   }
 
-  paymentConfirmation(userId, shopId, email, transactionId, retrievalReference) {
-    return this.http.get(this.url+'checkout/paymentConfirmation/'+userId+'/'+shopId, {
-        params: {
-          email: email,
-          transactionId: transactionId,
-          retrievalReference: retrievalReference
-        }
-      })
+  getPaymentConfirmation(checkoutId) {
+    return this.http.get(this.url+'checkout/getpaymentconfirmation/'+checkoutId)
       .map(res => {
         return res.json()
       });

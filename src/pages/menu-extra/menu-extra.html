@@ -11,7 +11,31 @@
 
 <ion-content>
   <div class="content" style="padding: 5px;">
-    <ion-grid>
+
+    <ion-grid style="padding-bottom: 15px;" *ngFor="let menuChoice of menuChoices">
+      <ion-row>
+        <ion-col class="ftc-dusty-font ftc-button-menu" style="display: flex; align-items: center; width: 100%">
+          <p style="padding-left: 5px; margin: 0px;">{{ menuChoice.name }}</p>
+        </ion-col>
+      </ion-row>
+      <ion-list radio-group>
+        <ion-row *ngFor="let menuChoiceItem of menuChoice.menuChoiceItems">
+          <ion-col class="ftc-dusty-font ftc-button-menu" style="display: flex; align-items: center; max-width: 7%">
+            <ion-radio style="padding-left: 5px;" (ionSelect)="addMenuChoice(menuChoice.id, menuChoiceItem.id)"></ion-radio>
+          </ion-col>
+          <ion-col class="ftc-dusty-font ftc-button-menu">
+            <p style="padding-left: 5px; margin: 0px;">{{ menuChoiceItem.name }}</p>
+          </ion-col>
+        </ion-row>
+      </ion-list>
+    </ion-grid>
+
+    <ion-grid *ngIf="menuExtras?.length != 0">
+      <ion-row>
+        <ion-col class="ftc-dusty-font ftc-button-menu" style="display: flex; align-items: center; width: 100%">
+          <p style="padding-left: 5px; margin: 0px;">Add some extras</p>
+        </ion-col>
+      </ion-row>
       <ion-row *ngFor="let menuExtra of menuExtras">
         <ion-col class="ftc-dusty-font ftc-button-menu" style="display: flex; align-items: center; max-width: 7%">
           <ion-checkbox (ionChange)="addMenuExtra($event, menuExtra.id)" style="padding-left: 5px;"></ion-checkbox>
@@ -23,9 +47,17 @@
             <p style="padding-left: 5px; margin: 0px;">{{ menuExtra.price | currency:"£" }}</p>
         </ion-col>
       </ion-row>
-      <ion-row style="height: 120px;"></ion-row>
     </ion-grid>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col style="padding-top: 120px;">
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
   </div>
+
   <ion-fab bottom center style="margin-left: -50px;">
     <img src="/assets/imgs/order-now.png" (click)="confirm()" style="width: 100px;"/>
   </ion-fab>

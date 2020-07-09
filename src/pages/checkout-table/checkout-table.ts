@@ -17,7 +17,7 @@ export class CheckoutTablePage {
   tableNumber: number;
   name: string;
   phone: string;
-  amount: string;
+  checkoutId: string;
 
   constructor(
     public navCtrl: NavController, 
@@ -44,7 +44,7 @@ export class CheckoutTablePage {
 
   ionViewDidLoad() {
     this.loader.hidePreloader();
-    this.amount = this.navParams.get("amount");
+    this.checkoutId = this.navParams.get("checkoutId");
   }
 
   confirm() {
@@ -120,8 +120,7 @@ export class CheckoutTablePage {
           this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
         }else{
           this.navCtrl.push(PaymentIframePage, {
-            'userId': this.currentUser.id,
-            'amount': this.amount,
+            'checkoutId': this.checkoutId,
           });
         }
       }, err => {
