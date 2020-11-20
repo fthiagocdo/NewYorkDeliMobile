@@ -37,13 +37,13 @@ import { SagepayProvider } from '../providers/sagepay/sagepay';
 import { PreloaderProvider } from '../providers/preloader/preloader';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAuTKvGborYvmUbsJZCGblJPkQToftLwbc",
-  authDomain: "new-york-deli-70024.firebaseapp.com",
-  databaseURL: "https://new-york-deli-70024.firebaseio.com",
-  projectId: "new-york-deli-70024",
-  storageBucket: "new-york-deli-70024.appspot.com",
-  messagingSenderId: "97143556372",
-  appId: "1:97143556372:web:4dfaf119098fde1e"
+  apiKey: "AIzaSyAO3VWN1z1mJyt4b5UbF_znqSFPNFwJgqk",
+  authDomain: "new-york-deli-6bf9b.firebaseapp.com",
+  databaseURL: "https://new-york-deli-6bf9b.firebaseio.com",
+  projectId: "new-york-deli-6bf9b",
+  storageBucket: "new-york-deli-6bf9b.appspot.com",
+  messagingSenderId: "625405167152",
+  appId: "1:625405167152:web:283f162a764dd92ed9cff5"
 }
 
 @NgModule({

@@ -57,31 +57,33 @@ export class ShopPage {
   }
 
   confirmShop(shop) {
-    this.loader.displayPreloader();
+    if(shop.available) {
+      this.loader.displayPreloader();
     
-    let navCtrl = this.navCtrl;
-    let auth = this.auth;
-    this.currentShop.shopId = shop.id;
-    this.currentShop.shopName = shop.name;
-    this.currentShop.shopUrl = shop.url;
-    this.currentShop.shopVendorName = shop.vendor_name;
-    this.currentShop.shopIntegrationKey = shop.integration_key;
-    this.currentShop.shopIntegrationPassword = shop.integration_password;
-    this.currentShop.delivery = shop.delivery == '1' ? true : false;
+      let navCtrl = this.navCtrl;
+      let auth = this.auth;
+      this.currentShop.shopId = shop.id;
+      this.currentShop.shopName = shop.name;
+      this.currentShop.shopUrl = shop.url;
+      this.currentShop.shopVendorName = shop.vendor_name;
+      this.currentShop.shopIntegrationKey = shop.integration_key;
+      this.currentShop.shopIntegrationPassword = shop.integration_password;
+      this.currentShop.delivery = shop.delivery == '1' ? true : false;
 
-    if(this.currentUser.isLogged){
-      this.http.getShoppingCart(this.currentUser.id, this.currentShop.shopId)
-      .subscribe(data => { 
+      if(this.currentUser.isLogged){
+        this.http.getShoppingCart(this.currentUser.id, this.currentShop.shopId)
+        .subscribe(data => { 
+          auth.setShop(this.currentShop);
+          navCtrl.setRoot(MenuPage);
+        }, err => {
+          this.loader.hidePreloader();
+          this.utils.showMessage('It was not possible complete the request. Please try again later...', 'error');
+        });
+      }else{
         auth.setShop(this.currentShop);
         navCtrl.setRoot(MenuPage);
-      }, err => {
         this.loader.hidePreloader();
-        this.utils.showMessage('It was not possible complete the request. Please try again later...', 'error');
-      });
-    }else{
-      auth.setShop(this.currentShop);
-      navCtrl.setRoot(MenuPage);
-      this.loader.hidePreloader();
+      }
     }
   }
 
@@ -100,3 +102,4 @@ export class ShopPage {
   }
 
 }
+

@@ -1,3 +1,41 @@
 page-login {
+    a {
+        color: #272500;
+        font-weight: bold;
+    }
+	
+	.item {
+        padding-left: 0px !important;
+    }
 
+    .ftc-item-background-color {
+        background-color: transparent;
+    }
+    
+    .checkbox-icon {
+        border-color: #272500 !important;
+        background: transparent !important;
+    }
+    
+    .checkbox-icon .checkbox-checked {
+        background: transparent !important;
+    }
+
+    .checkbox .checkbox-checked .checkbox-inner {
+        border-color: #272500 !important;
+    }
+    
+    .item-checkbox .checkbox {
+        margin: 9px 9px 9px 4px !important;
+    }
+    
+    .item-checkbox .label {
+        color: #272500 !important;
+        font-weight: 400;
+        font-size: 1.5rem;
+    }
+    
+    .item-checkbox .item-inner {
+        border: none !important;
+    }
 }

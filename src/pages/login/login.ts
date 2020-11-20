@@ -24,11 +24,7 @@ export class LoginPage {
   currentUser: any;
   email: string;
   password: string;
-  generateSecureKeyAlias: string = 'CByPOCfqJD';
-  generateSecureIVAlias: string = 'akGoaW6ifP';
-  secureKeyAlias: string = 'rRnrMSkc3x';
-  secureIVAlias: string = 'wRHuW2DmiY';
-  keepmeLoggedAlias: string = 'rkZvGqUbSs';
+  keepLogged: boolean = false;
   
   constructor(
     public navCtrl: NavController, 
@@ -47,182 +43,120 @@ export class LoginPage {
       this.auth.activeUser.subscribe((_user)=>{
         this.currentUser = _user;
       });
+
+      this.keepMeLogged();
   }
 
-  ionViewDidLoad() {
+  ionViewDidLoad() { }
+
+  async keepMeLogged() {
     this.loader.displayPreloader();
-    
-    if(this.platform.is('cordova')){
-      this.getDetailsKeepmeLogged();
-    }else{
-      this.loader.hidePreloader();
-    }
-    
+
+    await this.storage.get('UID').then((val) => {
+      if(!this.utils.isEmpty(val)){
+        this.currentUser.uid = val;
+      }
+    });
+
+    await this.storage.get('EMAIL').then((val) => {
+      if(!this.utils.isEmpty(val)){
+        this.currentUser.email = val;
+      }
+    });
+
+    await this.storage.get('PROVIDER').then((val) => {
+      if(!this.utils.isEmpty(val)){
+        this.currentUser.provider = val;
+      }
+    });
+
+    await this.validateUser();
+
+    this.loader.hidePreloader();
   }
 
-  showYesNoDialog() {
-    let alert = this.alertCtrl.create({
-      title: 'Keep me logged?',
-      buttons: [{
-        text: 'No',
-        cssClass: 'primary-color',
-        handler: () => {
-          if(this.platform.is('cordova')){
-            this.utils.clearDetailsKeepmeLogged();
+  async validateUser() {
+    //Retrieves the user in the api
+    this.http.findOrCreateUser(this.currentUser)
+      .subscribe(data => {
+        //Found user
+        if(!data.details_customer.error){
+          if(data.details_customer.customer.allow_access == '1'){
+            this.utils.setUserInfo(data.details_customer.customer);
+            this.utils.showMessageLogin(data.info_messages);
+            this.goToShopPage();
           }
         }
-      }, {
+    });
+  }
+
+  resendEmailVerification() {
+    let alert = this.alertCtrl.create({
+      title: 'Email not verified. Resend email verification?',
+      buttons: [{
         text: 'Yes',
         cssClass: 'primary-color',
         handler: () => {
-          if(this.platform.is('cordova')){
-            this.setDetailsKeepmeLogged(this.currentUser);
-          }
+          firebase.auth().currentUser.sendEmailVerification()
+            .then(success => {
+              this.utils.showMessage('Please validate your email address. Kindly check your inbox.', 'info');
+              this.loader.hidePreloader();
+            }, err => {
+              console.log(err);
+              this.utils.showMessage(err.message, 'error');
+              this.loader.hidePreloader();
+            });  
+        }
+      }, {
+        text: 'No',
+        cssClass: 'primary-color',
+        handler: () => {
+          this.auth.doLogout();
+          this.loader.hidePreloader();
         }
       }],
-      cssClass: 'primary-color'
+      cssClass: 'ftc-info-color'
     });
     alert.present();
   }
 
-  setDetailsKeepmeLogged(user) {
-    let detailsKeepmeLogged = user.uid+','+user.email+','+user.provider;
-    if(user.provider != 'email'){
-      detailsKeepmeLogged += ','+user.name+','+user.photo;
-    }
-    
-    let secureKey = null;
-    let secureIV = null;
-
-    this.aes256.generateSecureKey(this.generateSecureKeyAlias)
-      .then(res => {
-        secureKey = res;
-        this.storage.set(this.secureKeyAlias, res);
-        
-        this.aes256.generateSecureIV(this.generateSecureIVAlias)
-          .then(res => {
-            secureIV = res;
-            this.storage.set(this.secureIVAlias, res);
-            
-            this.aes256.encrypt(secureKey, secureIV, detailsKeepmeLogged)
-              .then(res => {
-                this.storage.set(this.keepmeLoggedAlias, res);
-              });
-          })
-      });
-  }
-
-  getDetailsKeepmeLogged() {
-    let secureKey = null;
-    let secureIV = null;
-    let details = null;
-    
-    this.storage.get(this.keepmeLoggedAlias).then((val) => {
-      if(!this.utils.isEmpty(val)){
-        details = val;
-        this.storage.get(this.secureKeyAlias)
-          .then((val) => { 
-            secureKey = val; 
-            
-            this.storage.get(this.secureIVAlias)
-              .then((val) => { 
-                secureIV = val; 
-            
-                this.aes256.decrypt(secureKey, secureIV, details)
-                  .then(res => {
-                    this.keepmeLogged(res.split(','));
-                  });
-            });
-          });
-      }else{
-        this.loader.hidePreloader();
-      }
-    });
-  }
-
-  keepmeLogged(details) {
-    let auth = this.auth;
-    let utils = this.utils;
-    let login = this;
-
-    this.currentUser.uid = details[0];
-    this.currentUser.email = details[1];
-    this.currentUser.provider = details[2];
-    if(this.currentUser.provider != 'email'){
-      this.currentUser.name = details[3];
-      this.currentUser.photo = details[4];
-    }
-
-    //Retrieves the user in the api
-    this.http.findOrCreateUser(this.currentUser)
-    .subscribe(data => {
-      //Can't find the user
-      if(data.details_customer.error){
-        auth.doLogout();
-        this.loader.hidePreloader();
-        utils.showMessage(data.details_customer.message, 'error');
-      //Found the user
-      }else{
-        login.setUserInfo(data.details_customer.customer);
-        login.showMessage(data.info_messages);
-        login.goToShopPage(); 
-      }
-    }, err => {
-      this.loader.hidePreloader();
-      utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
-    });
-  }
-
   loginMail() {
     if(this.validateData()){
-      this.currentUser.email = this.email;
-
-      let login = this;
-      let currentUser = this.currentUser;
-      let utils = this.utils;
-      let http = this.http;
-      let auth = this.auth;
       this.loader.displayPreloader();
+      let _class = this;
 
-      //Signs in firebase
       this.angularFireAuth.auth.signInWithEmailAndPassword(this.email, this.password)
         .then(function (credential) {
-          if(credential.user.emailVerified){
-            currentUser.uid = credential.user.uid;
-            currentUser.email = credential.user.email;
-            currentUser.provider = 'email';
-            
+          if(credential.user.emailVerified) {
+            _class.currentUser.uid = credential.user.uid;
+            _class.currentUser.email = credential.user.email;
+            _class.currentUser.provider = 'email';
+
             //Retrieves the user in the api
-            http.findOrCreateUser(currentUser)
+            _class.http.findOrCreateUser(_class.currentUser)
               .subscribe(data => {
                 //Can't find the user
                 if(data.details_customer.error){
-                  auth.doLogout();
-                  this.loader.hidePreloader();
-                  utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
+                  _class.auth.doLogout();
+                  _class.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
+                  _class.loader.hidePreloader();
                 //Found the user
                 }else{
-                  if(data.details_customer.customer.allow_access == '1'){
-                    login.showYesNoDialog();
-                  }
-                  login.setUserInfo(data.details_customer.customer);
-                  login.showMessage(data.info_messages);
-                  login.goToShopPage(); 
+                  _class.utils.showMessageLogin(data.info_messages);
+                  _class.setUserInfo(data.details_customer.customer);
+                  _class.goToShopPage();
                 }
-              }, err => {
-                auth.doLogout();
-                this.loader.hidePreloader();
-                utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
-              });
-          }else{
-            auth.doLogout();
-            this.loader.hidePreloader();
-            utils.showMessage('Please validate your email address. Kindly check your inbox.', 'error');
+            }, err => {
+              _class.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
+              _class.loader.hidePreloader();
+            });
+          } else {
+            _class.resendEmailVerification();
           }
-      }, function (err) {
-        this.loader.hidePreloader();
-        utils.showMessage(err.message, 'error');
-      });
+        }, function (err) {
+          _class.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
+          _class.loader.hidePreloader();
+        });
     }
   }
 
@@ -235,59 +169,49 @@ export class LoginPage {
   }
 
   webGoogleLogin() {
-    let currentUser = this.currentUser;
-    let utils = this.utils;
-    let login = this;
-    let auth = this.auth;
-    let http = this.http;
     this.loader.displayPreloader();
 
     const provider = new firebase.auth.GoogleAuthProvider();
     this.angularFireAuth.auth.signInWithPopup(provider)
       .then(function (credential) {
-        currentUser.uid = credential.user.uid;
-        currentUser.email = credential.user.email;
-        currentUser.name = credential.user.displayName;
-        currentUser.photo = credential.user.photoURL;
-        currentUser.provider = 'google';
+        this.currentUser.uid = credential.user.uid;
+        this.currentUser.email = credential.user.email;
+        this.currentUser.name = credential.user.displayName;
+        this.currentUser.photo = credential.user.photoURL;
+        this.currentUser.provider = 'google';
 
         //Retrieves the user in the api
-        http.findOrCreateUser(currentUser)
+        this.http.findOrCreateUser(this.currentUser)
           .subscribe(data => {
             //Can't find the user
             if(data.details_customer.error){
-              auth.doLogout();
+              this.uth.doLogout();
+              this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
               this.loader.hidePreloader();
-              utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
             //Found the user
             }else{
               if(data.details_customer.customer.allow_access == '1'){
-                login.showYesNoDialog();
+                this.showYesNoDialog();
               }
-              login.setUserInfo(data.details_customer.customer);
-              login.showMessage(data.info_messages);
-              login.goToShopPage();
+              this.setUserInfo(data.details_customer.customer);
+              this.showMessage(data.info_messages);
+              this.goToShopPage();
             }
         }, err => {
+          this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
           this.loader.hidePreloader();
-          utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
         });
     }, function (err) {
+      this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
       this.loader.hidePreloader();
-      utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
     })
     .catch( err => { 
+      this.utils.showMessage(err.message, 'error');
       this.loader.hidePreloader();
-      utils.showMessage(err.message, 'error');
     });
   }
 
   nativeGoogleLogin() {
-    let currentUser = this.currentUser;
-    let utils = this.utils;
-    let login = this;
-    let auth = this.auth;
-    let http = this.http;
     this.loader.displayPreloader();
      
     this.googleplus.login({
@@ -297,51 +221,45 @@ export class LoginPage {
         const googleCredential = firebase.auth.GoogleAuthProvider.credential(res.idToken);
         firebase.auth().signInWithCredential(googleCredential)
           .then( user => {
-            currentUser.uid = user.uid;
-            currentUser.email = user.email;
-            currentUser.name = user.displayName;
-            currentUser.photo = user.photoURL;
-            currentUser.provider = 'google';
+            this.currentUser.uid = user.uid;
+            this.currentUser.email = user.email;
+            this.currentUser.name = user.displayName;
+            this.currentUser.photo = user.photoURL;
+            this.currentUser.provider = 'google';
             
             //Retrieves the user in the api
-            http.findOrCreateUser(currentUser)
+            this.http.findOrCreateUser(this.currentUser)
               .subscribe(data => {
                 //Can't find the user
                 if(data.details_customer.error){
-                  auth.doLogout();
+                  this.auth.doLogout();
+                  this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
                   this.loader.hidePreloader();
-                  utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
                 //Found the user
                 }else{
                   if(data.details_customer.customer.allow_access == '1'){
-                    login.showYesNoDialog();
+                    this.setUserInfo(data.details_customer.customer);
+                    this.utils.showMessage(data.info_messages);
+                    this.goToShopPage();
                   }
-                  login.setUserInfo(data.details_customer.customer);
-                  login.showMessage(data.info_messages);
-                  login.goToShopPage();
                 }
             }, err => {
+              this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
               this.loader.hidePreloader();
-              utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
             });
       })
       .catch( error => { 
+        this.utils.showMessage(error, 'error');
         this.loader.hidePreloader();
-        utils.showMessage(error, 'error');
       });
     })
     .catch( err => { 
+      this.utils.showMessage(err.message, 'error');
       this.loader.hidePreloader();
-      utils.showMessage(err.message, 'error');
     });
   }
 
   loginFacebook() {
-    let currentUser = this.currentUser;
-    let utils = this.utils;
-    let login = this;
-    let auth = this.auth;
-    let http = this.http;
     this.loader.displayPreloader();
 
     this.facebook.login(['email'])
@@ -350,42 +268,41 @@ export class LoginPage {
           .credential(res.authResponse.accessToken);
         firebase.auth().signInWithCredential(facebookCredential)
           .then( user => { 
-            currentUser.uid = user.uid;
-            currentUser.email = user.email;
-            currentUser.name = user.displayName;
-            currentUser.photo = user.photoURL+'?height=256&width=256';
-            currentUser.provider = 'facebook'; 
+            this.currentUser.uid = user.uid;
+            this.currentUser.email = user.email;
+            this.currentUser.name = user.displayName;
+            this.currentUser.photo = user.photoURL+'?height=256&width=256';
+            this.currentUser.provider = 'facebook'; 
 
             //Retrieves the user in the api
-            http.findOrCreateUser(currentUser)
+            this.http.findOrCreateUser(this.currentUser)
               .subscribe(data => {
                 //Can't find the user
                 if(data.details_customer.error){
-                  auth.doLogout();
+                  this.auth.doLogout();
+                  this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
                   this.loader.hidePreloader();
-                  utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
                 //Found the user
                 }else{
                   if(data.details_customer.customer.allow_access == '1'){
-                    login.showYesNoDialog();
+                    this.setUserInfo(data.details_customer.customer);
+                    this.utils.showMessage(data.info_messages);
+                    this.goToShopPage();
                   }
-                  login.setUserInfo(data.details_customer.customer);
-                  login.showMessage(data.info_messages);
-                  login.goToShopPage();
                 }
             }, err => {
+              this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
               this.loader.hidePreloader();
-              utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
             });
           })
           .catch( error => { 
+            this.utils.showMessage(error, 'error');
             this.loader.hidePreloader();
-            utils.showMessage(error, 'error');
           });
       })
       .catch( err => { 
+        this.utils.showMessage(err.message, 'error');
         this.loader.hidePreloader();
-        utils.showMessage(err.message, 'error');
       });
   }
 
@@ -414,40 +331,25 @@ export class LoginPage {
     return valid;
   }
 
-  setUserInfo(customer) {
-    this.currentUser.id = customer.id;
-    this.currentUser.phone = customer.phone_number;
-    this.currentUser.address = customer.address;
-    this.currentUser.postcode = customer.postcode;
-    this.currentUser.allowAccess = customer.allow_access == '1' ? true : false;
-    this.currentUser.showMessage = customer.show_message  == '1' ? true : false;
-    this.currentUser.receiveNotifications = customer.receive_notifications == '1' ? true : false;
-    if(!this.utils.isEmpty(customer.name)){
-      this.currentUser.name = customer.name;
-    }
-    if(this.currentUser.provider == 'email'){
-      this.currentUser.photo = "/assets/imgs/user.png";
-    }
+  setUserInfo(data) {
+    this.utils.setUserInfo(data);
 
-    this.auth.doLogin(this.currentUser);
-  }
-
-  showMessage(info_messages){
-    if(info_messages.hasMessages && this.currentUser.showMessage){
-      info_messages.messages.forEach(item => {
-        this.utils.showMessage(item.message, 'info');
-      });
+    if(this.keepLogged) {
+      this.utils.setKeepMeLogged();
+    } else {
+      this.utils.clearKeepMeLogged();
     }
   }
 
   goToShopPage() {
     if(this.currentUser.allowAccess){
+      this.auth.doLogin(this.currentUser);
       this.navCtrl.setRoot(ShopPage, {
         'showMenu': false,
         'disableClosedShops': true,
       });
     }else{
-      this.utils.clearDetailsKeepmeLogged();
+      this.utils.clearKeepMeLogged();
       this.auth.doLogout();
       this.loader.hidePreloader();
     }

@@ -42,7 +42,7 @@ export class PaymentIframePage {
     this.loader.displayPreloader();
 
     this.checkoutId = this.navParams.get('checkoutId');
-    this.url = this.sanitizer.bypassSecurityTrustResourceUrl('http://newyorkdelidelivery.ftcdevsolutions.com/payment/iframe/'+this.currentUser.id+'/'+this.currentShop.shopId);
+    this.url = this.sanitizer.bypassSecurityTrustResourceUrl('https://newyorkdelidelivery.ftcdevsolutions.com/payment/iframe/android/'+this.currentUser.id+'/'+this.currentShop.shopId);
     
     setTimeout(() => {
       this.loader.hidePreloader();

@@ -9,15 +9,9 @@
 
 <ion-content> 
   <ion-grid>
-    <ion-row *ngFor="let shop of shops">
-      <ion-col class="ftc-dusty-font ftc-button-menu ftc-radio">
-        <ion-radio *ngIf="shop.available" value="{{ shop.id }}" (ionSelect)="confirmShop(shop)"></ion-radio>
-        <button *ngIf="!shop.available" ion-button icon-only clear>
-          <ion-icon name="close-circle"></ion-icon>
-        </button>
-      </ion-col>
-      <ion-col class="ftc-dusty-font ftc-button-menu">
-        <p class="title">{{ shop.name }}</p>
+    <ion-row *ngFor="let shop of shops" (click)="confirmShop(shop)">
+      <ion-col class="ftc-dusty-font ftc-button-menu shop_description">
+        <p>{{ shop.name }}</p>
         <p>{{ shop.address }}</p>
         <p *ngIf="!shop.available" class="shop_closed">This deli is closed at this moment.</p>
       </ion-col>

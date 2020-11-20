@@ -12,7 +12,6 @@ import { OrderHistoryPage } from '../pages/order-history/order-history';
 import { CheckoutPage } from '../pages/checkout/checkout';
 import { Authentication } from '../providers/auth/auth';
 import { Utils } from '../utils/utils';
-import { PaymentIframePage } from '../pages/payment-iframe/payment-iframe';
 import { PreloaderProvider } from '../providers/preloader/preloader';
 
 @Component({
@@ -31,20 +30,20 @@ export class MyApp {
     public platform: Platform, 
     public statusBar: StatusBar, 
     public splashScreen: SplashScreen, 
-    public auth : Authentication, 
+    public auth: Authentication, 
     public loader: PreloaderProvider, 
     public utils: Utils) { 
-    this.initializeApp();
+      this.initializeApp();
 
-    this.auth.activeUser.subscribe((_user)=>{
-      this.currentUser = _user;
-    });
+      this.auth.activeUser.subscribe((_user)=>{
+        this.currentUser = _user;
+      });
 
-    this.auth.activeShop.subscribe((_shop)=>{
-      this.currentShop = _shop;
-    });
+      this.auth.activeShop.subscribe((_shop)=>{
+        this.currentShop = _shop;
+      });
 
-    this.loadData();
+      this.loadData();
   }
 
   loadData() {
@@ -76,7 +75,7 @@ export class MyApp {
     
     if(page.title == 'Logout'){
       this.auth.doLogout();
-      this.utils.clearDetailsKeepmeLogged();
+      this.utils.clearKeepMeLogged();
       this.nav.setRoot(LoginPage);
     }else if((page.title == 'Menu' || page.title == 'Checkout' || page.title == 'Order History') 
       && this.utils.isEmpty(this.currentShop.shopId)){

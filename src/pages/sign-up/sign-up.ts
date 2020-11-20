@@ -60,7 +60,6 @@ export class SignUpPage {
           //Signs up in the api
           http.findOrCreateUser(currentUser)
             .subscribe(data => {
-              utils.showMessage(JSON.stringify(data), 'error');
               //Can't sign up in the api
               if(data.details_customer.error){
                 this.loader.hidePreloader();

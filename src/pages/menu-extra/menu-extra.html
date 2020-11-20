@@ -19,9 +19,9 @@
         </ion-col>
       </ion-row>
       <ion-list radio-group>
-        <ion-row *ngFor="let menuChoiceItem of menuChoice.menuChoiceItems">
+        <ion-row *ngFor="let menuChoiceItem of menuChoice.menuChoiceItems; let count = index;">
           <ion-col class="ftc-dusty-font ftc-button-menu" style="display: flex; align-items: center; max-width: 7%">
-            <ion-radio style="padding-left: 5px;" (ionSelect)="addMenuChoice(menuChoice.id, menuChoiceItem.id)"></ion-radio>
+            <ion-radio style="padding-left: 5px;" (ionSelect)="addMenuChoice(menuChoice.id, menuChoiceItem.id)" checked="{{ count == 0 ? true : false }}"></ion-radio>
           </ion-col>
           <ion-col class="ftc-dusty-font ftc-button-menu">
             <p style="padding-left: 5px; margin: 0px;">{{ menuChoiceItem.name }}</p>

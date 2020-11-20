@@ -45,11 +45,11 @@ export class MenuExtraPage {
     this.menuExtras = this.navParams.get('menuExtras');
     this.menuChoices = this.navParams.get('menuChoices');
 
-    this.menuChoices.forEach(menuChoice => {
+    this.menuChoices.forEach(menuChoice => {      
       let selectedChoice = {
         id: menuChoice.id,
         name: menuChoice.name,
-        menuChoiceItemId: null
+        menuChoiceItemId: menuChoice.menuChoiceItems[0].id
       };
       this.selectedChoices.push(selectedChoice);
     });
@@ -81,13 +81,15 @@ export class MenuExtraPage {
   confirm() {
     if(this.validateChoices()) {
       this.loader.displayPreloader();
+      let _class = this;
+
       this.http.addMenuItem(this.currentUser.id, this.currentShop.shopId, this.menuItemId, this.selectedExtras, this.selectedChoices)
         .subscribe(data => { 
           if(data.error){
-            this.loader.hidePreloader();
-            this.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
+            _class.loader.hidePreloader();
+            _class.utils.showMessage('It was no possible complete your request. Please try again later...', 'error');
           }else{
-            this.navCtrl.setRoot(MenuPage, {
+            _class.navCtrl.setRoot(MenuPage, {
               'itemAdded': true,
               'message': data.message,
             });
