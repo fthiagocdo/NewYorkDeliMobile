@@ -25,7 +25,6 @@ import { ShopPage } from '../pages/shop/shop';
 import { CheckoutTablePage } from '../pages/checkout-table/checkout-table';
 import { SignUpPage } from '../pages/sign-up/sign-up';
 import { CheckoutCollectPage } from '../pages/checkout-collect/checkout-collect';
-import { PaymentPage } from '../pages/payment/payment';
 import { PaymentIframePage } from '../pages/payment-iframe/payment-iframe';
 
 import { StatusBar } from '@ionic-native/status-bar';
@@ -37,13 +36,13 @@ import { SagepayProvider } from '../providers/sagepay/sagepay';
 import { PreloaderProvider } from '../providers/preloader/preloader';
 
  const firebaseConfig = {
-  apiKey: "AIzaSyAuTKvGborYvmUbsJZCGblJPkQToftLwbc",
-    authDomain: "new-york-deli-70024.firebaseapp.com",
-    databaseURL: "https://new-york-deli-70024.firebaseio.com",
-    projectId: "new-york-deli-70024",
-    storageBucket: "new-york-deli-70024.appspot.com",
-    messagingSenderId: "97143556372",
-    appId: "1:97143556372:web:aefd3b0f2aa88dae575a01"
+  apiKey: "AIzaSyAO3VWN1z1mJyt4b5UbF_znqSFPNFwJgqk",
+  authDomain: "new-york-deli-6bf9b.firebaseapp.com",
+  databaseURL: "https://new-york-deli-6bf9b.firebaseio.com",
+  projectId: "new-york-deli-6bf9b",
+  storageBucket: "new-york-deli-6bf9b.appspot.com",
+  messagingSenderId: "625405167152",
+  appId: "1:625405167152:web:283f162a764dd92ed9cff5"
 }
 
 @NgModule({
@@ -64,7 +63,6 @@ import { PreloaderProvider } from '../providers/preloader/preloader';
     ShopPage,
     CheckoutTablePage,
     CheckoutCollectPage,
-    PaymentPage,
     PaymentIframePage,
   ],
   imports: [
@@ -93,7 +91,6 @@ import { PreloaderProvider } from '../providers/preloader/preloader';
     ShopPage,
     CheckoutTablePage,
     CheckoutCollectPage,
-    PaymentPage,
     PaymentIframePage,
   ],
   providers: [

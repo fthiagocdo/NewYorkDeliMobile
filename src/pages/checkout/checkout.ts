@@ -7,7 +7,6 @@ import { Utils } from '../../utils/utils';
 import { Authentication } from '../../providers/auth/auth';
 import { CheckoutCollectPage } from '../checkout-collect/checkout-collect';
 import { PreloaderProvider } from '../../providers/preloader/preloader';
-import { PaymentIframePage } from '../payment-iframe/payment-iframe';
 
 @IonicPage()
 @Component({

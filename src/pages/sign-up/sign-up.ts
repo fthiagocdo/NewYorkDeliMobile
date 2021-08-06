@@ -48,6 +48,7 @@ export class SignUpPage {
 
       let navCtrl = this.navCtrl;
       let http = this.http;
+      let auth = this.auth;
       let utils = this.utils;
       let currentUser = this.currentUser;
 
@@ -63,15 +64,14 @@ export class SignUpPage {
               //Can't sign up in the api
               if(data.details_customer.error){
                 this.loader.hidePreloader();
-                utils.showMessage('1It was no possible complete your request. Please try again later...'+data.details_customer.error, 'error');
+                utils.showMessage('It was no possible complete your request. Please try again later...'+data.details_customer.error, 'error');
               //Signs up in the api successfully
               }else{
                 let firebaseUser = firebase.auth().currentUser;
                 firebaseUser.sendEmailVerification().then(
                   (success) => {
-                    currentUser.id = data.details_customer.customer.id;
-                    currentUser.receiveNotifications = data.details_customer.customer.receive_notifications == '1' ? true : false;
-                    currentUser.photo = "/assets/imgs/user.png";
+                    auth.doLogout();
+                    utils.clearKeepMeLogged();
                     utils.showMessage('Please validate your email address. Kindly check your inbox.', 'info');
                     navCtrl.setRoot(LoginPage);
                   } 
